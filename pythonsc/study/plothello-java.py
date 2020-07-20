@@ -2,15 +2,56 @@
 import matplotlib.pyplot as plt
 import sys
 import time
+import json
 
-print("Hello world!");
+#Sample command:
+#success:
+#python C:/fh/ws1/fh-script/pythonsc/study/plothello-java.py {'outputPath':'C:/fh/pf/apache-tomcat-9.0.21/webapps/webcat/diagrams','diagramFileName':'-1'}
+#python C:/fh/ws1/fh-script/pythonsc/study/plothello-java.py "{'outputPath': 'C:/fh/pf/apache-tomcat-9.0.21/webapps/webcat/diagrams','diagramFileName':'-1'}"
+#
+#Failed:
+#python C:/fh/ws1/fh-script/pythonsc/study/plothello-java.py {'outputPath':'/C:/fh/pf/apache-tomcat-9.0.21/webapps/webcat/diagrams','diagramFileName':'-1'}
 
-for i in range(1, len(sys.argv)):
-	if (i==1):
-		picPath=sys.argv[i]
-	print(sys.argv[i]);
+logLevel=20;
+# 1-debug, 2-log, 3-warning, 4-error
 
-print("picPath: "+picPath);
+def getLogLevel():
+	if logLevel == 4:
+		return "error level"
+	elif logLevel == 3:
+		return "warning level"
+	elif logLevel == 2:
+		return "log level"
+	elif logLevel == 1:
+		return "debug level"
+	else:
+		return "unknow level: ", logLevel
+		
+def myprint_error(*s):
+	#if logLevel <= 4:
+		print("Error - ", s)
+		
+def myprint_warn(*s):
+	if logLevel <= 3:
+		print("Warn - ", s)
+		
+def myprint_log(*s):
+	if logLevel <= 2:
+		print("Log - ", s)
+		
+def myprint_debug(*s):
+	if logLevel <= 1:
+		print("Debug - ", s)
+
+#print("Hello world!");
+#myprint_error(getLogLevel());
+
+param1=sys.argv[1]
+myprint_debug("param1: ", type(param1), param1);
+params = json.loads(param1.replace("'", "\""));
+
+picPath=params['outputPath'];
+myprint_debug("picPath: "+picPath);
 
 #Testing parameters
 #picPath="D:\\pythontest";
@@ -61,6 +102,10 @@ plt.plot(x, y_arctan);
 plt.title('Arctan');
 
 t=time.strftime("%Y%m%d-%H%M%S", time.localtime());
-plt.savefig(picPath+'\\plothello'+t+'.png',bbox_inches='tight')
+fileName='plothello'+t+'.png'
+plt.savefig(picPath+'/'+fileName,bbox_inches='tight')
 
-plt.show()
+params['diagramFileName']=fileName;
+
+print(json.dumps(params));
+#plt.show()
