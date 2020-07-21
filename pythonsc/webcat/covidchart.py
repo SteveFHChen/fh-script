@@ -1,3 +1,5 @@
+#coding: UTF-8
+
 from pymysql import *
 #import pandas as pd
 import numpy as np
@@ -113,10 +115,13 @@ plt.subplot(1,2,1);
 plt.plot(datalist0, datalist1, label='Sin(x)', color='blue', linewidth=2.0, linestyle='dotted');
 plt.scatter(datalist0, datalist1, label='Sin(x)', color='red');
 
+plt.title(area);
+
 #display new case
 plt.subplot(1,2,2);
 plt.plot(datalist0, datalist2, label='Sin(x)', color='blue', linewidth=2.0, linestyle='dotted');
 plt.scatter(datalist0, datalist2, label='Sin(x)', color='red');
+
 
 t=time.strftime("%Y%m%d-%H%M%S", time.localtime());
 fileName='plothello'+t+'.png'
