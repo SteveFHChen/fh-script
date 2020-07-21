@@ -1,0 +1,8 @@
+pip
+numpy
+scipy
+pandas
+matplotlib
+sklearn
+PyMySQL
+selenium
