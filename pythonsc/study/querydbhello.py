@@ -1,9 +1,9 @@
 from pymysql import *
 #import pandas as pd
-#import numpy as np
+import numpy as np
 #from sklearn import linear_model
 #from sqlalchemy import create_engine
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 
 conn = connect(host='localhost', port=3306, database='test',
@@ -12,12 +12,22 @@ conn = connect(host='localhost', port=3306, database='test',
 cs1 = conn.cursor()
  #四个参数，表名，列名1，列名2，预测年份
 input1 = 'covid_area_stat'
-input2 = 'total_confirmed'
+input2_1 = 'total_confirmed'
+input2_2 = 'new_confirmed'
 input3 = '美国'
 input4 = 'business_date'
 
 #读取第一列year
-sql1 = "select (%s) from (%s) where area='%s' order by (%s) desc; " % (input2,input1,input3,input4)
+sql1 = "select (%s) from (%s) where area='%s' order by (%s) asc; " % (input4,input1,input3,input4)
+cs1.execute(sql1)
+datalist0 = []
+alldata0 = cs1.fetchall()
+for s in alldata0:
+    datalist0.append(s[0])
+print(datalist0)
+
+sql1 = "select (%s) from (%s) where area='%s' order by (%s) asc; " % (input2_1,input1,input3,input4)
+#sql1 = "select (%s) from (%s) where area='%s' order by (%s) asc; " % (input2_2,input1,input3,input4)
 cs1.execute(sql1)
 datalist1 = []
 alldata1 = cs1.fetchall()
@@ -35,3 +45,8 @@ for i in datalist1:
 #datalist22=np.array(datalist2).reshape(1,-1)
 print(datalist11)
 
+x=np.arange(len(datalist11))
+
+plt.plot(datalist0, datalist1, label='Sin(x)', color='red', linewidth=2.0, linestyle='dotted');
+plt.scatter(datalist0, datalist1, label='Sin(x)', color='red', linewidth=2.0, linestyle='dotted');
+plt.show()

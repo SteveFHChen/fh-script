@@ -6,11 +6,11 @@ import json
 
 #Sample command:
 #success:
-#python C:/fh/ws1/fh-script/pythonsc/study/plothello-java.py {'outputPath':'C:/fh/pf/apache-tomcat-9.0.21/webapps/webcat/diagrams','diagramFileName':'-1'}
-#python C:/fh/ws1/fh-script/pythonsc/study/plothello-java.py "{'outputPath': 'C:/fh/pf/apache-tomcat-9.0.21/webapps/webcat/diagrams','diagramFileName':'-1'}"
+#python C:/fh/ws1/fh-script/pythonsc/study/plothello-java.py {'outputPath':'C:/fh/pf/apache-tomcat-9.0.21/webapps/webcat/charts','diagramFileName':'-1'}
+#python C:/fh/ws1/fh-script/pythonsc/study/plothello-java.py "{'outputPath': 'C:/fh/pf/apache-tomcat-9.0.21/webapps/webcat/charts','diagramFileName':'-1'}"
 #
 #Failed:
-#python C:/fh/ws1/fh-script/pythonsc/study/plothello-java.py {'outputPath':'/C:/fh/pf/apache-tomcat-9.0.21/webapps/webcat/diagrams','diagramFileName':'-1'}
+#python C:/fh/ws1/fh-script/pythonsc/study/plothello-java.py {'outputPath':'/C:/fh/pf/apache-tomcat-9.0.21/webapps/webcat/charts','diagramFileName':'-1'}
 
 logLevel=20;
 # 1-debug, 2-log, 3-warning, 4-error

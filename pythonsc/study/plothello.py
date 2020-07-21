@@ -10,7 +10,7 @@ for i in range(1, len(sys.argv)):
 		picPath=sys.argv[i]
 	print(sys.argv[i]);
 
-print("picPath: "+picPath);
+#print("picPath: "+picPath);
 
 #Testing parameters
 #picPath="D:\\pythontest";
@@ -61,6 +61,6 @@ plt.plot(x, y_arctan);
 plt.title('Arctan');
 
 t=time.strftime("%Y%m%d-%H%M%S", time.localtime());
-plt.savefig(picPath+'\\plothello'+t+'.png',bbox_inches='tight')
+#plt.savefig(picPath+'\\plothello'+t+'.png',bbox_inches='tight')
 
 plt.show()
