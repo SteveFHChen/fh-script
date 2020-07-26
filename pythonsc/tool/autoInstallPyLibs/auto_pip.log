@@ -6,3 +6,24 @@
 2020-07-21 10:24:01 - WARNING - ---------------->numpyinstalled!
 2020-07-21 10:24:01 - WARNING - ---------------->PyMySQLinstalled!
 2020-07-21 10:24:01 - WARNING - ---------------->seleniuminstalled!
+2020-07-24 20:09:39 - WARNING - ---------------->pipinstalled!
+2020-07-24 20:09:49 - INFO - ---------------->numpyinstalled pass!
+2020-07-24 20:10:09 - INFO - ---------------->scipyinstalled pass!
+2020-07-24 20:10:28 - INFO - ---------------->pandasinstalled pass!
+2020-07-24 20:10:41 - INFO - ---------------->matplotlibinstalled pass!
+2020-07-24 20:10:56 - INFO - ---------------->sklearninstalled pass!
+2020-07-24 20:10:59 - ERROR - --------------->mysqlinstalled failed!
+2020-07-24 20:11:00 - INFO - ---------------->PyMySQLinstalled pass!
+2020-07-24 20:11:03 - INFO - ---------------->seleniuminstalled pass!
+
+
+
+2020-07-24 20:14:02 - WARNING - ---------------->pipinstalled!
+2020-07-24 20:14:02 - WARNING - ---------------->numpyinstalled!
+2020-07-24 20:14:02 - WARNING - ---------------->scipyinstalled!
+2020-07-24 20:14:02 - WARNING - ---------------->pandasinstalled!
+2020-07-24 20:14:02 - WARNING - ---------------->matplotlibinstalled!
+2020-07-24 20:14:02 - WARNING - ---------------->sklearninstalled!
+2020-07-24 20:14:04 - ERROR - --------------->mysqlinstalled failed!
+2020-07-24 20:14:04 - WARNING - ---------------->PyMySQLinstalled!
+2020-07-24 20:14:04 - WARNING - ---------------->seleniuminstalled!
