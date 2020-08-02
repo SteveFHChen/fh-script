@@ -3,6 +3,9 @@ import matplotlib.pyplot as plt
 import sys
 import time
 
+#python_matplotlib分别使用plot()和scatter()画散点图，以及如何改变点的大小
+#https://blog.csdn.net/Poul_henry/article/details/88602806
+
 print("Hello world!");
 
 for i in range(1, len(sys.argv)):

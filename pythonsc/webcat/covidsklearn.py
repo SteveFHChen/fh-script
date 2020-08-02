@@ -68,7 +68,11 @@ for s in alldata2:
 
 x=datalist02
 y=datalist2
-x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.4, random_state=42)
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.33, random_state=42)
+
+x_train2=[]
+for s in x_train:
+    x_train2.append(s[0])
 
 #Define model
 knn=KNeighborsClassifier()
@@ -77,9 +81,11 @@ knn=KNeighborsClassifier()
 knn.fit(x_train, y_train)
 
 #Predict data with the trainned model
-y_predict=knn.predict(x_test)
+#y_predict=knn.predict(x_test)
+y_predict=knn.predict(x)
 
-xindex = np.arange(len(x_test));
+#xindex = np.arange(len(y_predict));
+xindex = datalist0
 
 '''
 plt.subplot(2,2,1);
@@ -100,8 +106,14 @@ plt.subplot(1,1,1);
 plt.plot(xindex, y_predict, label='Predict', color='green');
 plt.scatter(xindex, y_predict, label='Predict', color='green');
 
-plt.plot(xindex, y_test, label='Line', color='blue', linewidth=2.0, linestyle='dotted');
-plt.scatter(xindex, y_test, label='Real', color='red');
+#plt.plot(xindex, y_test, label='Line', color='blue', linewidth=2.0, linestyle='dotted');
+#plt.scatter(xindex, y_test, label='Real', color='red');
+
+plt.plot(xindex, y, label='Line', color='blue', linewidth=2.0, linestyle='dotted');
+plt.scatter(xindex, y, label='Real', color='red');
+
+plt.scatter(x_train2, y_train, s=10, label='train', color='yellow');
+
 
 plt.title('Compare Predict and Real Result');
 plt.legend(loc='upper left')
