@@ -1,6 +1,5 @@
 #coding: UTF-8
 
-from pymysql import *
 #import pandas as pd
 import numpy as np
 #from sklearn import linear_model
@@ -13,7 +12,7 @@ import json
 
 #Sample command:
 #success:
-#python C:/fh/ws1/fh-script/pythonsc/webcat/covidchart.py "{'area': '美国', 'outputPath': 'C:/fh/pf/apache-tomcat-9.0.21/webapps/webcat/charts','diagramFileName':'-1'}"
+#python C:/fh/ws/ws1/fh-script/pythonsc/webcat/covidchart.py "{'area': '美国', 'outputPath': 'C:/fh/pf/apache-tomcat-9.0.21/webapps/webcat/charts','diagramFileName':'-1'}"
 
 logLevel=4;
 # 1-debug, 2-log, 3-warning, 4-error
@@ -49,6 +48,12 @@ def myprint_debug(*s):
 #print("Hello world!");
 #myprint_error(getLogLevel());
 
+mainScript = sys.argv[0]
+mainPath = mainScript[:mainScript.rfind("/")+1]
+
+sys.path.append(mainPath+'../utils')
+import dbutils as db
+
 param1=sys.argv[1]
 myprint_debug("param1: ", type(param1), param1);
 params = json.loads(param1.replace("'", "\""));
@@ -62,10 +67,7 @@ myprint_debug("picPath: "+picPath);
 #print("1 picPath: ", picPath);
 #print("2 picPath: "+picPath);
 
-conn = connect(host='localhost', port=3306, database='test',
-               user='root',
-               password='root123', charset='utf8')
-cs1 = conn.cursor()
+cs1 = db.conn.cursor()
  #四个参数，表名，列名1，列名2，预测年份
 input1 = 'covid_area_stat'
 input2_1 = 'total_confirmed'

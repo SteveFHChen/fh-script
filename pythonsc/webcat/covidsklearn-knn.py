@@ -6,8 +6,6 @@ from collections import Counter
 from sklearn.metrics import accuracy_score
 import matplotlib.pyplot as plt
 
-from pymysql import *
-
 import sys
 import time
 import json
@@ -16,6 +14,11 @@ import json
 #success:
 #python C:/fh/ws/ws1/fh-script/pythonsc/webcat/covidsklearn.py "{'area': '美国', 'outputPath': 'C:/fh/testenv1/chart','diagramFileName':'plothello20200725-185829.png'}"
 
+mainScript = sys.argv[0]
+mainPath = mainScript[:mainScript.rfind("/")+1]
+
+sys.path.append(mainPath+'../utils')
+import dbutils as db
 
 param1=sys.argv[1]
 #myprint_debug("param1: ", type(param1), param1);
@@ -27,10 +30,7 @@ picPath=params['outputPath'];
 
 fileName = diagramFileName[:len(diagramFileName)-4]+'-2'+diagramFileName[-4:]
 
-conn = connect(host='localhost', port=3306, database='test',
-               user='root',
-               password='root123', charset='utf8')
-cs1 = conn.cursor()
+cs1 = db.conn.cursor()
  #四个参数，表名，列名1，列名2，预测年份
 input1 = 'covid_area_stat'
 input2_1 = 'total_confirmed'
