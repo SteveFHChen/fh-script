@@ -1,66 +1,16 @@
 #coding: UTF-8
 
-#import pandas as pd
-import numpy as np
-#from sklearn import linear_model
-#from sqlalchemy import create_engine
-import matplotlib.pyplot as plt
-
-import sys
-import time
-import json
-
 #Sample command:
-#success:
 #python C:/fh/ws/ws1/fh-script/pythonsc/webcat/covidchart.py "{'area': '美国', 'outputPath': 'C:/fh/pf/apache-tomcat-9.0.21/webapps/webcat/charts','diagramFileName':'-1'}"
 
-logLevel=4;
-# 1-debug, 2-log, 3-warning, 4-error
+from head import *
 
-def getLogLevel():
-	if logLevel == 4:
-		return "error level"
-	elif logLevel == 3:
-		return "warning level"
-	elif logLevel == 2:
-		return "log level"
-	elif logLevel == 1:
-		return "debug level"
-	else:
-		return "unknow level: ", logLevel
-		
-def myprint_error(*s):
-	#if logLevel <= 4:
-		print("Error - ", s)
-		
-def myprint_warn(*s):
-	if logLevel <= 3:
-		print("Warn - ", s)
-		
-def myprint_log(*s):
-	if logLevel <= 2:
-		print("Log - ", s)
-		
-def myprint_debug(*s):
-	if logLevel <= 1:
-		print("Debug - ", s)
-
-#print("Hello world!");
 #myprint_error(getLogLevel());
-
-mainScript = sys.argv[0]
-mainPath = mainScript[:mainScript.rfind("/")+1]
-
-sys.path.append(mainPath+'../utils')
-import dbutils as db
-
-param1=sys.argv[1]
-myprint_debug("param1: ", type(param1), param1);
-params = json.loads(param1.replace("'", "\""));
+#lg.logLevel=1
 
 area=params['area'];
 picPath=params['outputPath'];
-myprint_debug("picPath: "+picPath);
+lg.debug("picPath: "+picPath);
 
 #Testing parameters
 #picPath="D:\\pythontest";
@@ -82,7 +32,7 @@ datalist0 = []
 alldata0 = cs1.fetchall()
 for s in alldata0:
     datalist0.append(s[0])
-myprint_debug(datalist0)
+lg.debug(datalist0)
 
 sql1 = "select (%s) from (%s) where area='%s' order by (%s) asc; " % (input2_1,input1,input3,input4)
 cs1.execute(sql1)
@@ -90,7 +40,7 @@ datalist1 = []
 alldata1 = cs1.fetchall()
 for s in alldata1:
     datalist1.append(s[0])
-myprint_debug(datalist1)
+lg.debug(datalist1)
 
 sql1 = "select (%s) from (%s) where area='%s' order by (%s) asc; " % (input2_2,input1,input3,input4)
 cs1.execute(sql1)
@@ -98,7 +48,7 @@ datalist2 = []
 alldata2 = cs1.fetchall()
 for s in alldata2:
     datalist2.append(s[0])
-myprint_debug(datalist2)
+lg.debug(datalist2)
 
 
 #新版的sklearn中，所有的数据都应该是二维矩阵，哪怕它只是单独一行或一列（比如前面做预测时，仅仅只用了一个样本数据），所以需要使用.reshape(1,-1)进行转换
@@ -108,7 +58,7 @@ for i in datalist1:
     list1=[i]
     datalist11.append(list1)
 #datalist22=np.array(datalist2).reshape(1,-1)
-myprint_debug(datalist11)
+lg.debug(datalist11)
 
 x=np.arange(len(datalist11))
 

@@ -17,8 +17,24 @@ mainScript = sys.argv[0]
 mainPath = mainScript[:mainScript.rfind("/")+1]
 
 sys.path.append(mainPath+'../utils')
+import logger as lg
 import dbutils as db
 
 param1=sys.argv[1]
 #myprint_debug("param1: ", type(param1), param1);
 params = json.loads(param1.replace("'", "\""));
+
+#How to use?
+#Way 1 - import all with namespace:
+#import head
+#import head as h
+#Import the libs, variables and function or class, but in a namespace.
+
+#Way 2 - import parts or all without namespace:
+#from head import *
+#Equals copy the block source code to there, so including the import libs.
+#Imported into a non-name space, so can use directly, but cannot update variable.
+#Also can import one function from the module.
+
+#Way 3 - just run the python script:
+#code=os.system("python head.py ...")

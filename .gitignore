@@ -7,6 +7,7 @@
 
 # production
 /target
+pythonsc/*/__pycache__
 
 # misc
 .classpath
