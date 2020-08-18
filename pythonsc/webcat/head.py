@@ -6,6 +6,9 @@ from collections import Counter
 from sklearn.metrics import accuracy_score
 import matplotlib.pyplot as plt
 
+from matplotlib.font_manager import FontProperties
+
+
 from sklearn import linear_model
 from sklearn.preprocessing import PolynomialFeatures
 
@@ -16,14 +19,17 @@ import json
 mainScript = sys.argv[0]
 mainPath = mainScript[:mainScript.rfind("/")+1]
 
+font = FontProperties(fname=mainPath+"simsun.ttc", size=10)
 sys.path.append(mainPath+'../utils')
 import logger as lg
 import dbutils as db
+from rank import *
 
 param1=sys.argv[1]
 #myprint_debug("param1: ", type(param1), param1);
 params = json.loads(param1.replace("'", "\""));
 
+#====================Description==================================
 #How to use?
 #Way 1 - import all with namespace:
 #import head

@@ -1,7 +1,10 @@
 ﻿import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.font_manager import FontProperties
 import sys
 import time
+
+font = FontProperties(fname=r"simsun.ttc", size=14)
 
 #python_matplotlib分别使用plot()和scatter()画散点图，以及如何改变点的大小
 #https://blog.csdn.net/Poul_henry/article/details/88602806
@@ -61,7 +64,7 @@ plt.title('Tan');
 
 plt.subplot(2,2,4);
 plt.plot(x, y_arctan);
-plt.title('Arctan');
+plt.title(u'Arctan测试', fontproperties=font);
 
 t=time.strftime("%Y%m%d-%H%M%S", time.localtime());
 #plt.savefig(picPath+'\\plothello'+t+'.png',bbox_inches='tight')

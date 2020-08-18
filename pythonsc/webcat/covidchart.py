@@ -67,13 +67,13 @@ plt.subplot(1,2,1);
 plt.plot(datalist0, datalist1, label='Sin(x)', color='blue', linewidth=2.0, linestyle='dotted');
 plt.scatter(datalist0, datalist1, label='Sin(x)', color='red');
 
-plt.title(area);
+plt.title(f"{area}-累计确诊人数", fontproperties=font);
 
 #display new case
 plt.subplot(1,2,2);
 plt.plot(datalist0, datalist2, label='Sin(x)', color='blue', linewidth=2.0, linestyle='dotted');
 plt.scatter(datalist0, datalist2, label='Sin(x)', color='red');
-
+plt.title(f"{area}-新增确诊人数", fontproperties=font);
 
 t=time.strftime("%Y%m%d-%H%M%S", time.localtime());
 fileName='plothello'+t+'.png'
