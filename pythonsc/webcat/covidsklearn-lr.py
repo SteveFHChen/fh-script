@@ -97,7 +97,7 @@ plt.plot(xidx2d_future, y_future_predict_avg, label='Future_avg', color='deeppin
 plt.plot(xidx2d, total, label='Real', color='blue', linewidth=1.0, linestyle='dotted')
 plt.scatter(xidx2d, total, label='Real', color='red')
 
-plt.title(f'{area}-Compare Predict and Real Result', fontproperties=font)
+plt.title(f'{area}-模型预测', fontproperties=font)
 plt.legend(loc='upper left')
 plt.xticks(x,xlabel)
 
