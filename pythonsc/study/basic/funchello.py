@@ -19,6 +19,8 @@ def addArray(x, y):
 def addJson(p):
     return {"x": p["x"], "y":p["y"], "sum": p["x"]+p["y"]}
 
+#Test case
+
 s=add(2,3)
 print("s:",s)
 

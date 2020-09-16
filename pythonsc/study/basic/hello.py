@@ -2,7 +2,7 @@ import sys
 import json
 
 #Sample command
-#python C:\fh\ws\ws1\fh-script\pythonsc\study\hello.py "{'area': '美国', 'outputPath': 'C:/fh/testenv1/chart','diagramFileName':'plothello20200725-185829.png'}"
+#python C:\fh\ws\ws1\fh-script\pythonsc\study\basic\hello.py "{'area': '美国', 'outputPath': 'C:/fh/testenv1/chart','diagramFileName':'plothello20200725-185829.png'}"
 
 #print("hello");
 param1=sys.argv[1]
