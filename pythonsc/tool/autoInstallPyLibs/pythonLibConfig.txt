@@ -7,3 +7,6 @@ sklearn
 mysql
 PyMySQL
 selenium
+
+tools
+torch

@@ -1,29 +1,39 @@
-2020-07-21 10:23:07 - WARNING - ---------------->numpyinstalled!
-2020-07-21 10:23:07 - WARNING - ---------------->PyMySQLinstalled!
-2020-07-21 10:23:50 - WARNING - ---------------->numpyinstalled!
-2020-07-21 10:23:50 - WARNING - ---------------->PyMySQLinstalled!
-2020-07-21 10:23:57 - INFO - ---------------->seleniuminstalled pass!
-2020-07-21 10:24:01 - WARNING - ---------------->numpyinstalled!
-2020-07-21 10:24:01 - WARNING - ---------------->PyMySQLinstalled!
-2020-07-21 10:24:01 - WARNING - ---------------->seleniuminstalled!
-2020-07-24 20:09:39 - WARNING - ---------------->pipinstalled!
-2020-07-24 20:09:49 - INFO - ---------------->numpyinstalled pass!
-2020-07-24 20:10:09 - INFO - ---------------->scipyinstalled pass!
-2020-07-24 20:10:28 - INFO - ---------------->pandasinstalled pass!
-2020-07-24 20:10:41 - INFO - ---------------->matplotlibinstalled pass!
-2020-07-24 20:10:56 - INFO - ---------------->sklearninstalled pass!
-2020-07-24 20:10:59 - ERROR - --------------->mysqlinstalled failed!
-2020-07-24 20:11:00 - INFO - ---------------->PyMySQLinstalled pass!
-2020-07-24 20:11:03 - INFO - ---------------->seleniuminstalled pass!
+2020-09-10 08:36:21 - INFO - Package         Version
+--------------- -------
+cycler          0.10.0 
+joblib          0.16.0 
+kiwisolver      1.2.0  
+lxml            4.5.2  
+matplotlib      3.3.0  
+numpy           1.19.1 
+pandas          1.0.5  
+Pillow          7.2.0  
+pip             19.2.3 
+PyMySQL         0.10.0 
+pyparsing       2.4.7  
+python-dateutil 2.8.1  
+pytils          0.3    
+pytz            2020.1 
+PyYAML          5.3.1  
+scikit-learn    0.23.1 
+scipy           1.5.1  
+selenium        3.141.0
+setuptools      41.2.0 
+six             1.15.0 
+sklearn         0.0    
+threadpoolctl   2.1.0  
+tools           0.1.9  
+urllib3         1.25.10
 
-
-
-2020-07-24 20:14:02 - WARNING - ---------------->pipinstalled!
-2020-07-24 20:14:02 - WARNING - ---------------->numpyinstalled!
-2020-07-24 20:14:02 - WARNING - ---------------->scipyinstalled!
-2020-07-24 20:14:02 - WARNING - ---------------->pandasinstalled!
-2020-07-24 20:14:02 - WARNING - ---------------->matplotlibinstalled!
-2020-07-24 20:14:02 - WARNING - ---------------->sklearninstalled!
-2020-07-24 20:14:04 - ERROR - --------------->mysqlinstalled failed!
-2020-07-24 20:14:04 - WARNING - ---------------->PyMySQLinstalled!
-2020-07-24 20:14:04 - WARNING - ---------------->seleniuminstalled!
+2020-09-10 08:36:21 - WARNING - ---------------->pipinstalled!
+2020-09-10 08:36:21 - WARNING - ---------------->numpyinstalled!
+2020-09-10 08:36:21 - WARNING - ---------------->scipyinstalled!
+2020-09-10 08:36:21 - WARNING - ---------------->pandasinstalled!
+2020-09-10 08:36:21 - WARNING - ---------------->matplotlibinstalled!
+2020-09-10 08:36:21 - WARNING - ---------------->sklearninstalled!
+2020-09-10 08:36:21 - ERROR - --------------->mysqlinstalled failed!
+2020-09-10 08:36:21 - WARNING - ---------------->PyMySQLinstalled!
+2020-09-10 08:36:21 - WARNING - ---------------->seleniuminstalled!
+2020-09-10 08:36:21 - WARNING - ---------------->installed!
+2020-09-10 08:36:21 - WARNING - ---------------->toolsinstalled!
+2020-09-10 08:36:21 - ERROR - --------------->torchinstalled failed!

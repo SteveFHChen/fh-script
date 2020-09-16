@@ -13,7 +13,12 @@ lines=fo.read().splitlines()#读取返回是列表，没有换行符
 #2-执行安装库的指令
 backInfo=os.popen("pip list")
 info=backInfo.read()
+logging.info("Version of libraries before install:")
+logging.info(info)
 print(info)
+
+#pip install xxx -i https://pypi.douban.com/simple/
+
 for line in lines:
     print(line)
     if line in info:
