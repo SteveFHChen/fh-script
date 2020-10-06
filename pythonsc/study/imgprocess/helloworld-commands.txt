@@ -1,0 +1,157 @@
+'''
+Refer:
+	python skimage图像处理(一)
+	https://www.jianshu.com/p/f2e88197e81d
+	
+	数字图像处理：图像的简单滤波（十一）
+	https://blog.csdn.net/AugustMe/article/details/96731652
+	
+	对图像进行滤波，可以有两种效果：
+	1. 平滑滤波，用来抑制噪声；
+	2. 微分算子，可以用来检测边缘和特征提取。
+	
+	可用来检测边缘的算子：sobel、roberts、scharr、prewitt、canny、交叉边缘检测。
+	garbor滤波：用来进行边缘检测和纹理特征提取
+	gaussian滤波：多维的滤波器，是一种平滑滤波，可以消除高斯噪声
+	中值滤波，一种平滑滤波，可以消除噪声
+	
+	3种库操作图片：skimage, opencv, PIL。
+	
+	skimage包的子模块，它对scipy.ndimage进行了扩展，提供了更多的图片处理功能。
+		子模块名称　                主要实现功能
+		io                 读取、保存和显示图片或视频
+		data               提供一些测试图片和样本数据
+		color              颜色空间变换
+		filters            图像增强、边缘检测、排序滤波器、自动阈值等
+		draw               操作于numpy数组上的基本图形绘制，包括线条、矩形、圆和文本等
+		transform          几何变换或其它变换，如旋转、拉伸和拉东变换等
+		morphology         形态学操作，如开闭运算、骨架提取等
+		exposure           图片强度调整，如亮度调整、直方图均衡等
+		feature            特征检测与提取等
+		measure            图像属性的测量，如相似性或等高线等
+		segmentation       图像分割
+		restoration        图像恢复
+		util               通用函数
+		
+	skimage程序自带了一些示例图片
+		astronaut     航员图片      coffee     一杯咖啡图片   
+		lena          美女图片   camera   拿相机的人图片   
+		coins           硬币图片     moon    月亮图片
+		checkerboard   棋盘图片       horse   马图片   
+		page   书页图片              chelsea   小猫图片     
+		hubble_deep_field    星空图片   text   文字图片
+		clock    时钟图片   immunohistochemistry   结肠图片
+		使用方法：
+		from skimage import io, data
+		dir(data)
+		io.imshow(data.camera())
+		show()
+		io.imsave('camera.jpg', data.camera())
+'''
+
+conda activate pytorch
+cd C:\fh\ws\ws1\fh-script\pythonsc\study\imgprocess
+
+#1. 使用skimage库加载图片，并显示
+import skimage.io as io
+im_sk=io.imread('dog.jpg')
+print(im_sk.shape)
+imshow(im_sk)
+show()
+
+print(type(im_sk))  #显示类型
+print(im_sk.shape)  #显示尺寸
+print(im_sk.shape[0])  #图片高度
+print(im_sk.shape[1])  #图片宽度
+print(im_sk.shape[2])  #图片通道数
+print(im_sk.size)   #显示总像素个数 = 高度 * 宽度 * 通道数
+print(im_sk.max())  #最大像素值
+print(im_sk.min())  #最小像素值
+print(im_sk.mean()) #像素平均值
+print(im_sk[0][0])#图像的像素值
+
+#2. 使用opencv库加载图片，并显示
+import cv2
+im_cv=cv2.imread('dog.jpg')
+print(im_cv.shape)
+imshow(im_cv)
+show()
+
+#3. 使用Pillow (PIL)库加载图片，并显示图片
+from PIL import Image
+im_pil=Image.open('dog.jpg')
+im_pil.show()
+
+#使用别一种方式显示图片 - pylab库
+from pylab import *
+imshow(im_pil)
+show()
+
+plt.figure()
+for i, im in enumerate([im_sk, im_cv, im_pil]):
+    ax = plt.subplot(1, 3, i+1)
+    ax.imshow(im)
+    plt.pause(2) #暂停2秒，产生动画效果
+
+#图1，图3显示正常，图像显示不正常，
+#因为opencv读取的图像为BGR格式，matplotllib使用RGB方式显示，图像通道顺序不一致。
+
+#可以使用opencv提供的方法：cv2.cvtColor( ) 进行图像颜色空间转换BRG -> RGB
+im_cv2 = cv2.cvtColor(im_cv, cv2.COLOR_BGR2RGB)
+imshow(im_cv2)
+show()
+
+
+#图片处理============>
+
+#将图片转为二值灰度图，并显示
+#对skimage加载的图片求灰度图
+from skimage import color
+im_sk_gray=color.rgb2gray(im_sk)
+imshow(im_sk_gray)
+show()
+
+#对PIL加载的图片求灰度图
+im2=im_pil.convert('L')
+#方式1
+im2.show()
+#方式2
+imshow(im2)
+show()
+#方式1显示的是二值灰度图，但方式2显示的不是。
+
+#使用sobel算子进行边缘检测，并显示边缘图
+from skimage import filters
+#使用sobel算子对原图进行边缘检测，并显示边缘图
+edges = filters.sobel(im_sk)
+imshow(edges)
+show()
+
+#使用sobel算子对灰度图进行边缘检测，并显示边缘图
+edges = filters.sobel(im_sk_gray)
+imshow(edges)
+show()
+
+#对图片旋转45度角，并显示
+im2_45=im2.rotate(45)
+im2_45.show()
+
+#查看图片大小
+#将image对象转化为数组对象，再查看数组结构大小
+im2_a=array(im2)
+im2_a.shape
+
+from scipy.ndimage import filters
+
+#产生一个与ima一个大小的0矩阵,如：产生一个2行3列0矩阵 a=zeros((2,3))
+imx=zeros(im2_a.shape)
+filters.sobel(im2_a,1,imx) # 使用Sobel变换查找图像的水平边缘
+
+imy=zeros(ima.shape)
+filters.sobel(im2_a,0,imy) # 使用Sobel变换查找图像的垂直边缘
+
+magnitude=sqrt(imx**2+imy**2)
+imshow(magnitude)
+show()
+
+
