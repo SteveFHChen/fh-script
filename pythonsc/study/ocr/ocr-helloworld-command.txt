@@ -1,0 +1,99 @@
+
+
+2020-10-10
+Reference:
+	tesseract 安装及使用 https://blog.csdn.net/showgea/article/details/82656515
+	python人工智能-图像识别 https://blog.csdn.net/github_33304260/article/details/79155154
+
+Download Tesseract software:
+	https://digi.bib.uni-mannheim.de/tesseract/
+	tesseract-ocr-w64-setup-v4.1.0.20190314.exe
+	
+To support Chinese, we need to download Chinese language library:
+	https://github.com/tesseract-ocr/tessdata
+	chi_sim.traineddata --> Simplified Chinese
+	chi_tra.traineddata --> Tranditional Chinese
+	and put into tessdata folder C:\Program Files\Tesseract-OCR\tessdata
+	
+Check Tesseract install success:
+	C:\Program Files\Tesseract-OCR>tesseract -v
+	tesseract v4.0.0.20190314
+	 leptonica-1.78.0
+	  libgif 5.1.4 : libjpeg 8d (libjpeg-turbo 1.5.3) : libpng 1.6.34 : libtiff 4.0.9 : zlib 1.2.11 : libwebp 0.6.1 : libopenjp2 2.2.0
+	 Found AVX2
+	 Found AVX
+	 Found SSE
+
+Check the supported language:
+	C:\Program Files\Tesseract-OCR>tesseract --list-langs
+	List of available languages (4):
+	chi_sim
+	chi_tra
+	eng
+	osd
+
+To use more saconvenient, we'd better to set environment variables:
+	set TESSDATA_PREFIX=C:\Program Files\Tesseract-OCR\tessdata
+	set PATH=C:\Program Files\Tesseract-OCR;%PATH%
+
+First hello world test:
+	Download the word image:
+	https://raw.githubusercontent.com/Python3WebSpider/TestTess/master/image.png
+	
+	Then run the command to process the image, the words can be captured and save into file result.txt.
+	C:\Users\steve\Pictures>tesseract test1.png result
+	Tesseract Open Source OCR Engine v4.0.0.20190314 with Leptonica
+
+Second test - work with python:
+
+	(pytorch) C:\Users\steve>pip install pytesseract
+	Collecting pytesseract
+	  Downloading pytesseract-0.3.6.tar.gz (13 kB)
+	Requirement already satisfied: Pillow in c:\fh\pf2\anaconda3\envs\pytorch\lib\site-packages (from pytesseract) (7.2.0)
+	Building wheels for collected packages: pytesseract
+	  Building wheel for pytesseract (setup.py) ... done
+	  Created wheel for pytesseract: filename=pytesseract-0.3.6-py2.py3-none-any.whl size=13635 sha256=76456275e06d1d2253bbb0f46d565df83d465e63164c2ad275d3ab58471ed417
+	  Stored in directory: c:\users\steve\appdata\local\pip\cache\wheels\be\c9\54\c3a5693600be95ece493b981ae104c94e1a2c4d3e434438810
+	Successfully built pytesseract
+	Installing collected packages: pytesseract
+	Successfully installed pytesseract-0.3.6
+
+	Python code:
+	from PIL import Image
+	import pytesseract
+	 
+	text = pytesseract.image_to_string(Image.open(r'C:\Users\steve\Pictures\test1.png'))
+	text = pytesseract.image_to_string(Image.open(r'C:\Users\steve\Pictures\test3.PNG'), lang="chi_sim+eng")
+	print(text)
+
+	Fh experiment(Success):
+	(base) C:\Users\steve>conda activate pytorch
+	
+	(pytorch) C:\Users\steve>python
+	Python 3.8.5 (default, Sep  3 2020, 21:29:08) [MSC v.1916 64 bit (AMD64)] :: Anaconda, Inc. on win32
+	Type "help", "copyright", "credits" or "license" for more information.
+	>>> from PIL import Image
+	>>> import pytesseract
+	>>> text = pytesseract.image_to_string(Image.open(r'C:\Users\steve\Pictures\test1.png'))
+	>>> text
+	'Python3WebSpider\n\x0c'
+
+Test - whether Chinese word can be caught from image:
+	这里我们通过+来合并使用多个语言包
+	
+	Command:
+	C:\Users\steve\Pictures>tesseract test3.PNG result3 -l chi_sim+eng
+	Tesseract Open Source OCR Engine v4.0.0.20190314 with Leptonica
+	
+	Python:
+	>>> text = pytesseract.image_to_string(Image.open(r'C:\Users\steve\Pictures\test3.PNG'), lang="chi_sim+eng")
+	>>> text
+	'L . 大 本 文 目 录\n\n、 〉 讽 行 。 第 一 章 相 关 概 念 概 述\n我 们 当 前 已 经 学 会 如 何 从 FC 转 换 为 CONV, 以
+	下 对 VGG-16 进 行 转 挽 , . 1.1 检 浩 框 袁 示\naor e oe 。 1.2 交 并 比\nVGG-16 输 入 图 像 为 224 * 224 * 3, 那 么 co
+	nv5_3 的 输 出 也 就 是 7 * 7 * 512。 。 第 二 章 基 础 阜 络\n\n。 2.1 基 础 网 络\n\x0c'
+ 
+Test - whether can support photograph or handwriting:
+	After tested by Fh, Tesseract also support photograph and handwriting.
+	
+	
+
