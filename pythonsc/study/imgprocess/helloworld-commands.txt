@@ -52,12 +52,16 @@ Refer:
 conda activate pytorch
 cd C:\fh\ws\ws1\fh-script\pythonsc\study\imgprocess
 
+import matplotlib.pyplot as plt
+plt.imshow(im_sk)
+plt.show()
+
 #1. 使用skimage库加载图片，并显示
 import skimage.io as io
 im_sk=io.imread('dog.jpg')
 print(im_sk.shape)
-imshow(im_sk)
-show()
+plt.imshow(im_sk)
+plt.show()
 
 print(type(im_sk))  #显示类型
 print(im_sk.shape)  #显示尺寸
@@ -74,8 +78,8 @@ print(im_sk[0][0])#图像的像素值
 import cv2
 im_cv=cv2.imread('dog.jpg')
 print(im_cv.shape)
-imshow(im_cv)
-show()
+plt.imshow(im_cv)
+plt.show()
 
 #3. 使用Pillow (PIL)库加载图片，并显示图片
 from PIL import Image
@@ -84,8 +88,8 @@ im_pil.show()
 
 #使用别一种方式显示图片 - pylab库
 from pylab import *
-imshow(im_pil)
-show()
+plt.imshow(im_pil)
+plt.show()
 
 plt.figure()
 for i, im in enumerate([im_sk, im_cv, im_pil]):
@@ -98,8 +102,8 @@ for i, im in enumerate([im_sk, im_cv, im_pil]):
 
 #可以使用opencv提供的方法：cv2.cvtColor( ) 进行图像颜色空间转换BRG -> RGB
 im_cv2 = cv2.cvtColor(im_cv, cv2.COLOR_BGR2RGB)
-imshow(im_cv2)
-show()
+plt.imshow(im_cv2)
+plt.show()
 
 
 #图片处理============>
@@ -108,29 +112,29 @@ show()
 #对skimage加载的图片求灰度图
 from skimage import color
 im_sk_gray=color.rgb2gray(im_sk)
-imshow(im_sk_gray)
-show()
+plt.imshow(im_sk_gray)
+plt.show()
 
 #对PIL加载的图片求灰度图
 im2=im_pil.convert('L')
 #方式1
 im2.show()
 #方式2
-imshow(im2)
-show()
+plt.imshow(im2)
+plt.show()
 #方式1显示的是二值灰度图，但方式2显示的不是。
 
 #使用sobel算子进行边缘检测，并显示边缘图
 from skimage import filters
 #使用sobel算子对原图进行边缘检测，并显示边缘图
 edges = filters.sobel(im_sk)
-imshow(edges)
-show()
+plt.imshow(edges)
+plt.show()
 
 #使用sobel算子对灰度图进行边缘检测，并显示边缘图
 edges = filters.sobel(im_sk_gray)
-imshow(edges)
-show()
+plt.imshow(edges)
+plt.show()
 
 #对图片旋转45度角，并显示
 im2_45=im2.rotate(45)

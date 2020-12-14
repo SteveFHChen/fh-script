@@ -1,0 +1,143 @@
+'''
+	颜色图谱	描述
+	autumn	红-橙-黄
+	bone	黑-白，x线
+	cool	青-洋红
+	copper	黑-铜
+	flag	红-白-蓝-黑
+	gray	黑-白
+	hot	黑-红-黄-白
+	hsv	hsv颜色空间， 红-黄-绿-青-蓝-洋红-红
+	inferno	黑-红-黄
+	jet	蓝-青-黄-红
+	magma	黑-红-白
+	pink	黑-粉-白
+	plasma	绿-红-黄
+	prism	 红-黄-绿-蓝-紫-...-绿模式
+	spring	洋红-黄
+	summer	绿-黄
+	viridis	蓝-绿-黄
+	winter	蓝-绿
+	
+	对python中list的拷贝与numpy的array的拷贝详解
+	https://www.jb51.net/article/155557.htm
+'''
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+#Test for loop
+for i in range(10):
+    print(i)
+    plt.pause(0.1)
+
+#定义一个二维3x4矩阵存储图像信息
+im2 = np.zeros((3,4))
+im=im2
+im
+im.shape
+plt.imshow(im)
+plt.show()
+
+im[1][1]=255
+im[1][3]=100
+
+#以默认图谱显示图像
+plt.imshow(im)
+plt.show()
+
+#以黑白方式显示图像
+plt.imshow(im, plt.cm.gray)
+plt.show()
+
+plt.figure()
+for i in range(0,255,10):
+    im[1][1]=i
+    plt.imshow(im)
+    plt.pause(0.1)
+
+#定义一个三维2x4x3矩阵存储2行4列RGB 3通道的图像信息
+im3=np.zeros((2,4,3))
+im=im3
+im
+im.shape
+plt.imshow(im)
+plt.show()
+
+im[1][2][0]=i
+im[1][2][1]=0
+im[1][2][2]=0
+plt.imshow(im)
+plt.show()
+
+
+array的复制：
+im22=im2.copy()
+
+#RGB转灰度图的实现：
+#RGB值和灰度的转换，3种色的权重不是相等的，
+#实际上是人眼对于彩色的感觉到亮度感觉的转换，这是一个心理学问题，有一个公式：Grey = 0.299*R + 0.587*G + 0.114*B
+#等价于skimage库中的这个函数：
+#from skimage import color
+#im_sk_gray=color.rgb2gray(im_sk)
+
+import skimage.io as io
+im_sk=io.imread('dog.jpg')
+im_sk=io.imread('jiedao.jpg')
+im_sk=io.imread('house1.jpg')
+
+#Method 1: using for loop - code complex, performance bad
+im_sk2=np.zeros((im_sk.shape[0], im_sk.shape[1]))
+
+for r in range(im_sk2.shape[0]):
+    for c in range(im_sk2.shape[1]):
+        #im_sk2[r][c]=(im_sk[r][c][0]+im_sk[r][c][1]+im_sk[r][c][2])/3
+        im_sk2[r][c]=0.299*im_sk[r][c][0]+0.587*im_sk[r][c][1]+0.114*im_sk[r][c][2]
+
+@Method 2: using matrix calculation - code simple, performance good
+k1 = np.array([0.299, 0.587, 0.114]) #FH find from internet
+k1 = np.array([0.2125, 0.7154, 0.0721]) #skimage kernal value
+im_sk2 = im_sk @ k1
+
+#tf.matmul(A,C)=np.dot(A,C)= A@C都属于叉乘
+#而tf.multiply(A,C)= A*C=A∙C属于点乘
+#Refer: https://blog.csdn.net/haiziccc/article/details/101361583
+
+plt.imshow(im_sk2)
+plt.show()
+
+plt.imshow(im_sk2, plt.cm.gray)
+plt.show()
+
+#图像模糊的实现：
+h=np.array(
+      [[1, 0, 1],
+       [0, 1, 0],
+       [1, 0, 1]])
+       
+h=np.array(
+      [[1, 1, 1],
+       [1, 1, 1],
+       [1, 1, 1]])
+
+im_sk_r1=np.zeros((im_sk.shape[0], im_sk.shape[1], im_sk.shape[2]))
+
+for r in range(1, im_sk.shape[0]-1):
+    for c in range(1, im_sk.shape[1]-1):
+        for k in range(im_sk.shape[2]):
+            im_sk_r1[r][c][k]= (
+                 h[0][0]*im_sk[r-1][c-1][k]+h[0][1]*im_sk[r-1][c][k]+h[0][2]*im_sk[r-1][c+1][k]\
+                +h[1][0]*im_sk[r  ][c-1][k]+h[1][1]*im_sk[r  ][c][k]+h[1][2]*im_sk[r  ][c+1][k]\
+                +h[2][0]*im_sk[r+1][c-1][k]+h[2][1]*im_sk[r+1][c][k]+h[2][2]*im_sk[r+1][c+1][k])/5
+
+plt.imshow(im_sk_r1/255)
+plt.show()
+
+#pyplot显示图像报错：Clipping input data to the valid range for imshow with RGB data ([0..1] for floats or [0..255] for integers)
+#原因：用cv2.imread读进来的图片是uint8格式的，每个点的像素值在[0,255]之间，之前定义的
+#image = tf.placeholder(tf.float32,[127,127,3])图片占位符是float32，所以会直接将0-255之间的整数变成小数，但是并没有归一化！ 要显示float32格式的图片，还需要一步操作：
+#image = image/255.
+
+#图像锐化的实现：
+
+
