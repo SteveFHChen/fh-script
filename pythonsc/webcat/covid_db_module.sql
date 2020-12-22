@@ -36,6 +36,11 @@ SELECT COUNT(1) FROM fact_covid;
  * move the data needed by python analysis into fact table.
  * So that python only focus on data analysis, instead of pre-process data.
  */
+
+CREATE TABLE fact_covid_bak1219 AS SELECT * FROM fact_covid;
+SELECT * FROM fact_covid_bak1219;
+SELECT COUNT(1) FROM fact_covid_bak1219;
+
 TRUNCATE TABLE fact_covid;
 
 INSERT INTO fact_covid(business_date, AREA, new_confirmed)
@@ -51,6 +56,13 @@ FROM (
 	      ORDER BY date1 DESC, AREA DESC, new_confirmed DESC) t
 ) t1 WHERE rank=1;
 
+/**
+ * Verify result, if no problem, then the backup table can be dropped.
+ */
+SELECT * FROM fact_covid;
+SELECT COUNT(1) FROM fact_covid;
+
+DROP TABLE fact_covid_bak1219;
 
 /**
  * The sql which will be used in python to get data for analysis.

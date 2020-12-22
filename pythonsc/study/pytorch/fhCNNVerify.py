@@ -8,18 +8,18 @@ Created on Sun Dec 13 15:45:03 2020
 import torch
 from torch import nn
 import torch.nn.functional as F
-from torch.autograd import Variable
 import numpy as np
 import matplotlib.pyplot as plt
 
 #x_train_float=torch.linspace(-1,1,100).reshape(100,1,3)
-x_train_float=torch.randn(1, 1, 96)
-x_train_float = torch.tensor(np.arange(-10,10,1).reshape(1,1,-1)).float()
+x_train_float = torch.randn(1, 1, 96)
+x_train_float = torch.tensor(np.arange(-8,8,1).reshape(2,1,8)).float() # 2批 x 1行 x 10列
+x_train_float = torch.linspace(-15, 15, 10*1*8).reshape(-1, 1, 8).float()
 #建立从-1到1之间一百个点并且改变他的阶数（从【1,100】变到【100,1】）
 #y=x_train_float #使用一元一次函数检测卷积神经网络序列预测
 y=x_train_float.pow(2) #使用一元二次函数检测卷积神经网络序列预测
 #建立x与y之间的关系y=x^2
-y_train_float=torch.normal(y,0.05)
+y_train_float=torch.normal(y, 5)
 y_train_float=y
 y_train_float_2d=y_train_float.view(1,-1)
 #在实际过程中由于不可避免的因素存在会有误差发生但是围绕实际值上下波动
@@ -64,34 +64,55 @@ class CNN_Series(nn.Module):
         out = self.fc(x)
         return out
     
-net = CNN_Series(20, 800, 16, 20)
+net = CNN_Series(8, 800, 16, 8)
 print('Net的网络体系结构为：', net)
 optimizer = torch.optim.SGD(net.parameters(), lr=0.00001)
 loss_func = nn.MSELoss()
 
+#Enable to train model if need
+
 for i in range(880):#我们训练一百次差不多了，如果要结果更加准确可以训练更多
-    if i:
-        loss.backward()#将误差返回给模型
-        optimizer.step()#建模型的数据更新
-    prediction=net(x_train_float)#将数据放入放入模型中
-    
-    loss=loss_func(prediction,y_train_float_2d)#把模拟的结果和实际的差计算出来
-    if i%10==0:
-        print("i={}, Loss: {}".format( i, loss))
-        #print("predition size:", prediction.size())
-        #print("y_train_float_2d size:", y_train_float_2d.size())
-    optimizer.zero_grad()
+    for j in range(x_train_float.size(0)):
+        x_train_floatx = x_train_float[j].reshape(1, 1, -1)
+        y_train_floatx_2d=y_train_float[j].view(1,-1)
+        if i:
+            loss.backward()#将误差返回给模型
+            optimizer.step()#建模型的数据更新
+        prediction=net(x_train_floatx)#将数据放入放入模型中
+        
+        loss=loss_func(prediction,y_train_floatx_2d)#把模拟的结果和实际的差计算出来
+        if i%10==0:
+            print("i={}, Loss: {}".format( i, loss))
+            #print("predition size:", prediction.size())
+            #print("y_train_float_2d size:", y_train_float_2d.size())
+        optimizer.zero_grad()
 
 print("x_train_float.size: ", x_train_float.size())
 print("y_train_float.size: ", y_train_float.size())
 print("prediction.size: ", prediction.size())
 
+#Save model
+torch.save(net.state_dict(), "nn1.pkl")
+
+#To improve performance, load existing model directly
+net.load_state_dict(torch.load("nn1.pkl"))
+
 #Show real graph
 plt.plot(x_train_float.view(-1).tolist(), y_train_float.view(-1).tolist(), color='blue', linewidth=1.0, linestyle='dotted')
 plt.scatter(x_train_float.view(-1).tolist(), y_train_float.view(-1).tolist(), color="blue")
 
+prediction = ''
+
 #Show train graph
-plt.plot(x_train_float.view(-1).tolist(),prediction.view(-1).tolist(),color="red", linewidth=2.0)
+for j in range(x_train_float.size(0)):
+    x_train_floatx = x_train_float[j].reshape(1, 1, -1)
+    predictionx = net(x_train_floatx)
+    if j==0:
+        prediction = predictionx
+    else:
+        prediction = torch.cat([prediction, predictionx])
+
+plt.plot(x_train_float.view(-1).tolist(), prediction.view(-1).tolist(),color="red", linewidth=2.0, linestyle='--')
 
 '''
 #Show test graph
@@ -103,10 +124,19 @@ plt.plot(x_test_float.tolist(), y_test_float.tolist(), color='green', linewidth=
 #lt.scatter(x2float.tolist(), y2float.tolist(), color="red")
 '''
 
-x_test_float = torch.tensor(np.array([-15, -13, -12, -8, -7, -4, -3.5, -2.8, -1.1, -0.3, 
-          0.3, 1.2, 2.5, 3.3, 4, 7, 8, 11, 12, 14]).reshape(1,1,-1)).float()
-y_test_float = net(x_test_float)
-plt.plot(x_test_float.view(-1).tolist(), y_test_float.view(-1).tolist(), color='green', linewidth=2.0)
+x_test_float = torch.tensor(np.array([
+          -15, -12, -8, -7, -4, -3.5, -2.8, -0.3, #无序的
+          0.3, 1.2, 2.5, 3.3, 7, 8, 11, 14, #无序的
+          -3, -2, -1, 0, 1, 2, 3, 4, 
+          7, 7.2, 7.8, 8.1, 8.3, 8.8, 9, 9.2, 
+          9, 9.3, 9.5, 9.9, 10.11, 10.4, 10.7, 11.2, 
+          14.3, 14.8, 15.1, 15.5, 15.8, 16, 16.2, 16.8, 
+          16, 16.5, 17, 17.5, 18, 18.5, 19, 19.5]).reshape(-1,1,8)).float()
+#x_test_float = torch.linspace(-15, 15, 1*1*8).reshape(-1, 1, 8).float()
+for j in range(x_test_float.size(0)):
+    x_test_floatx = x_test_float[j].reshape(1, 1, -1)
+    y_test_floatx = net(x_test_floatx)
+    plt.plot(x_test_floatx.view(-1).tolist(), y_test_floatx.view(-1).tolist(), color='green', linewidth=2.0, linestyle='--')
 
 plt.show()
 print("End")
