@@ -11,10 +11,12 @@ import torch.nn.functional as F
 import numpy as np
 import matplotlib.pyplot as plt
 
+LEN = 80
+
 #x_train_float=torch.linspace(-1,1,100).reshape(100,1,3)
 x_train_float = torch.randn(1, 1, 96)
 x_train_float = torch.tensor(np.arange(-8,8,1).reshape(2,1,8)).float() # 2批 x 1行 x 10列
-x_train_float = torch.linspace(-15, 15, 10*1*8).reshape(-1, 1, 8).float()
+x_train_float = torch.linspace(-15, 15, LEN).reshape(1, 1, -1).float()
 #建立从-1到1之间一百个点并且改变他的阶数（从【1,100】变到【100,1】）
 #y=x_train_float #使用一元一次函数检测卷积神经网络序列预测
 y=x_train_float.pow(2) #使用一元二次函数检测卷积神经网络序列预测
@@ -64,9 +66,11 @@ class CNN_Series(nn.Module):
         out = self.fc(x)
         return out
     
-net = CNN_Series(8, 800, 16, 8)
+
+    
+net = CNN_Series(LEN, 800, 16, LEN)
 print('Net的网络体系结构为：', net)
-optimizer = torch.optim.SGD(net.parameters(), lr=0.00001)
+optimizer = torch.optim.SGD(net.parameters(), lr=0.0001)
 loss_func = nn.MSELoss()
 
 #Enable to train model if need
@@ -92,10 +96,14 @@ print("y_train_float.size: ", y_train_float.size())
 print("prediction.size: ", prediction.size())
 
 #Save model
-torch.save(net.state_dict(), "nn1.pkl")
+torch.save(net.state_dict(), "nn0.pkl")
 
 #To improve performance, load existing model directly
-net.load_state_dict(torch.load("nn1.pkl"))
+net.load_state_dict(torch.load("nn0.pkl"))
+
+from matplotlib.font_manager import FontProperties
+font = {'family':'SimHei', 'weight':'normal', 'size':10} #字体设置方式2，可显示中文字体
+plt.title(f"CNN Verification", fontproperties=font);
 
 #Show real graph
 plt.plot(x_train_float.view(-1).tolist(), y_train_float.view(-1).tolist(), color='blue', linewidth=1.0, linestyle='dotted')
@@ -112,7 +120,19 @@ for j in range(x_train_float.size(0)):
     else:
         prediction = torch.cat([prediction, predictionx])
 
-plt.plot(x_train_float.view(-1).tolist(), prediction.view(-1).tolist(),color="red", linewidth=2.0, linestyle='--')
+plt.plot(x_train_float.view(-1).tolist(), prediction.view(-1).tolist(),color="green", linewidth=2.0)
+
+x_test_float = torch.linspace(-10, 25, LEN).reshape(1, 1, -1).float()
+predictionx = net(x_test_float)
+plt.plot(x_test_float.view(-1).tolist(), prediction.view(-1).tolist(),color="green", linewidth=2.0, linestyle='-.')
+
+x_test_float = torch.linspace(-5, 30, LEN).reshape(1, 1, -1).float()
+predictionx = net(x_test_float)
+plt.plot(x_test_float.view(-1).tolist(), prediction.view(-1).tolist(),color="green", linewidth=2.0, linestyle='-.')
+
+x_test_float = torch.linspace(0, 35, LEN).reshape(1, 1, -1).float()
+predictionx = net(x_test_float)
+plt.plot(x_test_float.view(-1).tolist(), prediction.view(-1).tolist(),color="green", linewidth=2.0, linestyle='-.')
 
 '''
 #Show test graph
@@ -123,7 +143,7 @@ y_test_float=net(x_test_float)
 plt.plot(x_test_float.tolist(), y_test_float.tolist(), color='green', linewidth=2.0)
 #lt.scatter(x2float.tolist(), y2float.tolist(), color="red")
 '''
-
+'''
 x_test_float = torch.tensor(np.array([
           -15, -12, -8, -7, -4, -3.5, -2.8, -0.3, #无序的
           0.3, 1.2, 2.5, 3.3, 7, 8, 11, 14, #无序的
@@ -137,6 +157,8 @@ for j in range(x_test_float.size(0)):
     x_test_floatx = x_test_float[j].reshape(1, 1, -1)
     y_test_floatx = net(x_test_floatx)
     plt.plot(x_test_floatx.view(-1).tolist(), y_test_floatx.view(-1).tolist(), color='green', linewidth=2.0, linestyle='--')
+'''
 
+plt.legend()
 plt.show()
 print("End")

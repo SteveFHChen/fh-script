@@ -75,20 +75,25 @@ torch.save(net.state_dict(), "gru1.pkl")
 #To improve performance, load existing model directly
 net.load_state_dict(torch.load("gru1.pkl"))
 
+from matplotlib.font_manager import FontProperties
+font = {'family':'SimHei', 'weight':'normal', 'size':10} #字体设置方式2，可显示中文字体
+plt.title(f"GRU Verification", fontproperties=font);
+
 #Show real graph
 plt.plot(x_train_float.view(-1).tolist(), y_train_float.view(-1).tolist(), color='blue', linewidth=1.0, linestyle='dotted')
-plt.scatter(x_train_float.view(-1).tolist(), y_train_float.view(-1).tolist(), color="blue")
+plt.scatter(x_train_float.view(-1).tolist(), y_train_float.view(-1).tolist(), color="blue", label="Real")
 
 print("h_state", h_state)
 prediction, h_state = net(x_train_float, h_state)
 print("h_state", h_state)
 
-plt.plot(x_train_float.view(-1).tolist(), prediction.view(-1).tolist(),color="red", linewidth=2.0, linestyle='--')
+plt.plot(x_train_float.view(-1).tolist(), prediction.view(-1).tolist(),color="green", label='Train', linewidth=2.0)
 
 x_test_float = torch.tensor(np.array([-19, -18, -17, -15, -13, -12, -8, -7, -4, -3.5, -2.8, -1.1, -0.3, 
           0.3, 1.2, 2.5, 3.3, 4, 7, 8, 11, 12, 14, 17, 18, 19, 20, 21, 22, 23, 24]).reshape(1,-1,1)).float()
 y_test_float, h_state = net(x_test_float, h_state)
-plt.plot(x_test_float.view(-1).tolist(), y_test_float.view(-1).tolist(), color='green', linewidth=2.0)
+plt.plot(x_test_float.view(-1).tolist(), y_test_float.view(-1).tolist(), color='green', linewidth=2.0, label='Test', linestyle='-.')
 
+plt.legend()
 plt.show()
 

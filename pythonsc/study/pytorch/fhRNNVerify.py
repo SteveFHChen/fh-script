@@ -71,14 +71,14 @@ class RNN(nn.Module):
         # outs = self.out(r_out)
         # return outs
 
-net = RNN(32, 3)
+net = RNN(48, 3)
 print('Net的网络体系结构为：', net)
-optimizer = torch.optim.Adam(net.parameters(), lr=0.2)   # optimize all cnn parameters
+optimizer = torch.optim.Adam(net.parameters(), lr=0.1)   # optimize all cnn parameters
 loss_func = nn.MSELoss()
 
 h_state = None      # for initial hidden state
-'''
-for i in range(1000):
+
+for i in range(2000):
     if i:
         loss.backward()#将误差返回给模型
         optimizer.step()#建模型的数据更新
@@ -94,7 +94,7 @@ for i in range(1000):
 
 #Save model
 torch.save(net.state_dict(), "rnn1.pkl")
-'''
+
 #To improve performance, load existing model directly
 net.load_state_dict(torch.load("rnn1.pkl"))
 
