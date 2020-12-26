@@ -126,16 +126,8 @@ conn = connect(host=db_host, port=db_port, database=db_name,
 
 cs1 = conn.cursor()
 
-#area='玻利维亚'
-#area='美国'
-area='印度'
-#area='俄罗斯'
-#area='尼泊尔'
-#area='意大利'
-
-
 #flag value: model_LR
-flag = ['model_LRx', 'model_LR2x', 'model_LR3x', 'model_Net', 'model_LSTMx', 'model_GRUx', 'model_CNNx', 'model_CNN2x']
+flag = ['model_LRx', 'model_LR2x', 'model_LR3x', 'model_Netx', 'model_LSTMx', 'model_GRUx', 'model_CNNx', 'model_CNN2']
 '''
     Net: looks very good
     LSTM: always return a line model
@@ -144,8 +136,15 @@ flag = ['model_LRx', 'model_LR2x', 'model_LR3x', 'model_Net', 'model_LSTMx', 'mo
 flag_train = ['model_Net','model_CNNx', 'model_CNN2x']
 flag_legend_on = True
 flag_legend = 0
-legend_loc = 'upper left'
+legend_loc1 = 'upper left'
+legend_loc2 = 'lower left'
 
+area='玻利维亚';legend_loc=legend_loc2; area_code='BOL'; cnn2_train=550; cnn2_lr=0.000000007;
+area='美国';    legend_loc=legend_loc1; area_code='USA'; cnn2_train=150; cnn2_lr=0.0000000000083;
+#area='印度';   legend_loc=legend_loc1; area_code='IND'; cnn2_train=150; cnn2_lr=0.0000000000005;
+#area='俄罗斯'; legend_loc=legend_loc1; area_code='RUS'; cnn2_train=150; cnn2_lr=0.0000000008;
+#area='尼泊尔'; legend_loc=legend_loc1; area_code='NPL'; cnn2_train=150; cnn2_lr=0.00000000005;
+#area='意大利'; legend_loc=legend_loc2; area_code='ITA'; cnn2_train=150; cnn2_lr=0.000000000008;
 
 sql1 = f"""
 	SELECT DATE_FORMAT(business_date, '%Y%m%d') business_date, new_confirmed, @rn:=@rn+1 rn,  DATE_FORMAT(business_date, '%m%d') biz_md
@@ -284,11 +283,11 @@ if 'model_Net' in flag:
     net.load_state_dict(torch.load("nn1.pkl"))
     
     prediction=net(x_train_float)
-    plt.plot(x_train_float.view(-1).tolist(), prediction.view(-1).tolist(), label='Net回归训练', color='black')
+    plt.plot(x_train_float.view(-1).tolist(), prediction.view(-1).tolist(), label='BPNN回归训练', color='black')
     #plt.plot(x_test, y_predict_poly3, label='Net回归预测', color='red', linestyle='-.')
     
     prediction=net(x_test_float)
-    plt.plot(x_test_float.view(-1).tolist(), prediction.view(-1).tolist(), label='Net回归预测', color='black', linestyle='-.')
+    plt.plot(x_test_float.view(-1).tolist(), prediction.view(-1).tolist(), label='BPNN回归预测', color='black', linestyle='-.')
     
     flag_legend += 1
     
@@ -438,16 +437,12 @@ if 'model_CNN2' in flag:
     
     net = CNN_Series(LEN, 80, 32, 1)
     print('Net的网络体系结构为：', net)
-    optimizer = torch.optim.SGD(net.parameters(), lr=0.0000000000005)#India
-    optimizer = torch.optim.SGD(net.parameters(), lr=0.00000000005)#Nepal
-    optimizer = torch.optim.SGD(net.parameters(), lr=0.0000000000008)#USA
-    optimizer = torch.optim.SGD(net.parameters(), lr=0.000000008)#Bolivia
-    optimizer = torch.optim.SGD(net.parameters(), lr=0.000000000008)#Italy
+    optimizer = torch.optim.SGD(net.parameters(), lr=cnn2_lr)#India
     loss_func = nn.MSELoss()
     
     #Enable to train model if need
     if 'model_CNN2' in flag_train:
-        for i in range(500):#我们训练一百次差不多了，如果要结果更加准确可以训练更多
+        for i in range(cnn2_train):#我们训练一百次差不多了，如果要结果更加准确可以训练更多
             #for j in range(y_train2_cnn.size(0)):
             if i:
                 loss.backward()#将误差返回给模型
@@ -462,15 +457,15 @@ if 'model_CNN2' in flag:
             optimizer.zero_grad()
         
         #Save model
-        torch.save(net.state_dict(), "cnn2.pkl")
+        torch.save(net.state_dict(), f'cnn2-{area_code}-{cnn2_lr}-{cnn2_train}.pkl')
     
     #To improve performance, load existing model directly
-    net.load_state_dict(torch.load("cnn2.pkl"))
+    net.load_state_dict(torch.load(f'cnn2-{area_code}-{cnn2_lr}-{cnn2_train}.pkl'))
     
     prediction = None
     
     prediction=net(y_train2_cnn)
-    plt.plot(x_train2_cnn, prediction.view(-1).tolist(), label='CNN2回归训练', color="red", linewidth=2.0)
+    plt.plot(x_train2_cnn, prediction.view(-1).tolist(), label='CNN回归训练', color="red", linewidth=2.0)
     
     prediction_test_list = []
     
@@ -487,7 +482,9 @@ if 'model_CNN2' in flag:
         #plt.scatter(list([i+64]), prediction.view(-1).tolist(), color="green")
         prediction_test_list.extend(prediction.view(-1).tolist())
         
-    plt.plot(list(range(tl, tl+len(prediction_test_list))), prediction_test_list, label='CNN2回归测试', color="green", linewidth=2.0, linestyle='-.')
+    plt.plot(list(range(tl, tl+len(prediction_test_list))), prediction_test_list, label='CNN回归测试', color="red", linewidth=2.0, linestyle='-.')
+    
+    flag_legend += 1
     
 if flag_legend_on and flag_legend > 0:
     #plt.rcParams['font.sans-serif']=['Simhei']  #解决图例中文显示问题，目前只知道黑体可行
