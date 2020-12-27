@@ -21,6 +21,10 @@ Created on Sat Dec 12 17:38:15 2020
 #使用PyTorch拟合曲线
 #https://blog.csdn.net/qq_42024963/article/details/96423297
 
+from sklearn import linear_model
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVR
+from sklearn.preprocessing import PolynomialFeatures
 import torch
 from torch import nn
 import torch.nn.functional as F
@@ -127,24 +131,28 @@ conn = connect(host=db_host, port=db_port, database=db_name,
 cs1 = conn.cursor()
 
 #flag value: model_LR
-flag = ['model_LRx', 'model_LR2x', 'model_LR3x', 'model_Netx', 'model_LSTMx', 'model_GRUx', 'model_CNNx', 'model_CNN2']
+flag = ['model_LR', 'model_LR2', 'model_LR3', 'model_KNNx', 'model_svmx', 
+        'model_BPNN', 'model_LSTMx', 'model_GRUx', 'model_CNNx', 'model_CNN2']
 '''
     Net: looks very good
     LSTM: always return a line model
     GRU: train performance is very slow
 '''
-flag_train = ['model_Net','model_CNNx', 'model_CNN2x']
+flag_train = ['model_BPNN','model_CNNx', 'model_CNN2x']
 flag_legend_on = True
 flag_legend = 0
 legend_loc1 = 'upper left'
 legend_loc2 = 'lower left'
+default_split_ratio=0.8;
 
-area='玻利维亚';legend_loc=legend_loc2; area_code='BOL'; cnn2_train=550; cnn2_lr=0.000000007;
-area='美国';    legend_loc=legend_loc1; area_code='USA'; cnn2_train=150; cnn2_lr=0.0000000000083;
-#area='印度';   legend_loc=legend_loc1; area_code='IND'; cnn2_train=150; cnn2_lr=0.0000000000005;
-#area='俄罗斯'; legend_loc=legend_loc1; area_code='RUS'; cnn2_train=150; cnn2_lr=0.0000000008;
-#area='尼泊尔'; legend_loc=legend_loc1; area_code='NPL'; cnn2_train=150; cnn2_lr=0.00000000005;
-#area='意大利'; legend_loc=legend_loc2; area_code='ITA'; cnn2_train=150; cnn2_lr=0.000000000008;
+plt.figure(figsize=(8,7), dpi=100) #横坐标和纵坐标都放大了10倍，分辨率为80个像素,dpi越大图像越清晰
+
+#area='玻利维亚';legend_loc=legend_loc2; area_code='BOL'; cnn2_train=550; cnn2_lr=0.000000007;text_y_max=2000;text_y_min=-1000; 
+area='美国';    legend_loc=legend_loc1; area_code='USA'; cnn2_train=150; cnn2_lr=0.0000000000083; text_y_max=380000;text_y_min=0; split_ratio=default_split_ratio;
+area='印度';   legend_loc=legend_loc2; area_code='IND'; cnn2_train=150; cnn2_lr=0.0000000000005; text_y_max=130000;text_y_min=-50000; split_ratio=default_split_ratio;
+#area='俄罗斯'; legend_loc=legend_loc1; area_code='RUS'; cnn2_train=150; cnn2_lr=0.0000000008; text_y_max=40000;text_y_min=0; split_ratin=default_split_ratio;
+#area='尼泊尔'; legend_loc=legend_loc1; area_code='NPL'; cnn2_train=550; cnn2_lr=0.000000000042; text_y_max=5500;text_y_min=0; split_ratio=default_split_ratio;
+#area='意大利'; legend_loc=legend_loc1; area_code='ITA'; cnn2_train=150; cnn2_lr=0.000000000008; text_y_max=48000;text_y_min=-5000; split_ratio=0.9; #如果在拐点处划分，那模型将无法准确预测将来。
 
 sql1 = f"""
 	SELECT DATE_FORMAT(business_date, '%Y%m%d') business_date, new_confirmed, @rn:=@rn+1 rn,  DATE_FORMAT(business_date, '%m%d') biz_md
@@ -196,14 +204,16 @@ plt.plot(x_full, y_full, color='blue', linewidth=1.0, linestyle='dotted')
 #plt.scatter(x_full, y_full, label="Real data", color="blue")
 plt.scatter(x_full, y_full, color="blue")
 
+
+
 def split_sequence(list, percent):
     a = int(len(list)*percent)
     x1 = list[:a]
     x2 = list[a:]
     return x1, x2
 
-x_train, x_test=split_sequence(x_full, 0.8)
-y_train, y_test=split_sequence(y_full, 0.8)
+x_train, x_test=split_sequence(x_full, split_ratio)
+y_train, y_test=split_sequence(y_full, split_ratio)
 
 x_train_float=torch.from_numpy(x_train).float()
 y_train_float=torch.from_numpy(y_train).float()
@@ -214,10 +224,12 @@ x_train_float3d = x_train_float.reshape(1, -1, 1)
 y_train_float3d = y_train_float.reshape(1, -1, 1)
 x_test_float3d = x_test_float.reshape(1, -1, 1)
 
-if 'model_LR' in flag:
-    from sklearn import linear_model
-    from sklearn.preprocessing import PolynomialFeatures
-    
+text_y = text_y_max-(text_y_max-text_y_min)*0.05
+plt.plot([len(x_train), len(x_train)], [text_y_min, text_y_max], label='数据集分割线', color='black', linewidth=2.0, linestyle='--')
+plt.text(int(len(x_train)/2), text_y, 'Training Data')
+plt.text(len(x_train)+int(len(x_test)/2)-10, text_y, 'Testing Data')
+
+if 'model_LR' in flag:    
     #Model 1:
     model_LR = linear_model.LinearRegression()
     model_LR.fit(x_train, y_train)
@@ -226,8 +238,8 @@ if 'model_LR' in flag:
     x_future = np.arange(20).reshape(-1,1) + 1 + x_full.max()
     y_future_predict = model_LR.predict(x_future)
     
-    plt.plot(x_train, model_LR.predict(x_train), label='一元一次线性回归训练', color='green')
-    plt.plot(x_test, y_predict, label='一元一次线性回归预测', color='green', linestyle='-.')
+    plt.plot(x_train, model_LR.predict(x_train), label='一元一次线性回归', color='green')
+    plt.plot(x_test, y_predict, color='green')
     flag_legend += 1
 
 if 'model_LR2' in flag:
@@ -239,8 +251,8 @@ if 'model_LR2' in flag:
     model_LR_poly.fit(x_train_poly, y_train)
     y_predict_poly=model_LR_poly.predict(x_test_poly)
     
-    plt.plot(x_train, model_LR_poly.predict(x_train_poly), label='一元二次非线性回归训练', color='darkorange')
-    plt.plot(x_test, y_predict_poly, label='一元二次非线性回归预测', color='darkorange', linestyle='-.')
+    plt.plot(x_train, model_LR_poly.predict(x_train_poly), label='一元二次非线性回归', color='darkorange')
+    plt.plot(x_test, y_predict_poly, color='darkorange')
     #plt.plot(x_future, y_future_predict, label='LR', color='red')
     flag_legend += 1
     
@@ -253,18 +265,44 @@ if 'model_LR3' in flag:
     model_LR_poly3.fit(x_train_poly3, y_train)
     y_predict_poly3=model_LR_poly3.predict(x_test_poly3)
     
-    plt.plot(x_train, model_LR_poly3.predict(x_train_poly3), label='一元三次非线性回归训练', color='fuchsia')
-    plt.plot(x_test, y_predict_poly3, label='一元三次非线性回归预测', color='fuchsia', linestyle='-.')
+    plt.plot(x_train, model_LR_poly3.predict(x_train_poly3), label='一元三次非线性回归', color='fuchsia')
+    plt.plot(x_test, y_predict_poly3, color='fuchsia')
     #plt.plot(x_future, y_future_predict, label='LR', color='red')
     flag_legend += 1
     
-if 'model_Net' in flag:
+if 'model_KNN' in flag:
+    knn=KNeighborsClassifier()
+    knn.fit(x_train, y_train)
+    y_predict=knn.predict(x_train)
+    y_future_predict=knn.predict(x_test)
+    #loss = 
+    
+    plt.plot(x_train, y_predict, label='KNN回归', color='#5edc1f')
+    plt.plot(x_test, y_future_predict, color='#5edc1f')
+    flag_legend += 1
+    
+if 'model_svm' in flag:
+    svr_rbf = SVR(kernel='rbf', C=500, gamma=1) #径向基核函数（Radial Basis Function）,即为高斯核
+        #gamma值越小，分类界面越连续；gamma值越大，分类界面越“散”，分类效果越好，但有可能会过拟合。
+    svr_rbf = SVR(kernel='linear', C=500, gamma=1) #线性核（Linear Kernel）
+        #C越大分类效果越好，但有可能会过拟合（defaul C=1）
+    #svr_rbf = SVR(kernel='poly', C=50, gamma=1) #多项式核（Polynomial Kernel）
+    svr_rbf.fit(x_train.reshape(-1,1), y_train.reshape(-1,1))
+    y_predict = svr_rbf.predict(x_train.reshape(-1,1))
+    y_future_predict = svr_rbf.predict(x_test.reshape(-1,1))
+    #loss = 
+    
+    plt.plot(x_train, y_predict, label='SVM回归', color='cyan')
+    plt.plot(x_test, y_future_predict, color='cyan')
+    flag_legend += 1
+    
+if 'model_BPNN' in flag:
     net=Net(1,800, 1)#我假设一个输入，隐藏层里有50个神经元，和一个输出
     print('Net的网络体系结构为：', net)
     optimizer=torch.optim.Adam(net.parameters(),0.1)#定义优化器
     loss_func=torch.nn.MSELoss()#训练出来的结果和实际对比
     
-    if 'model_Net' in flag_train:
+    if 'model_BPNN' in flag_train:
         for i in range(2000):#我们训练一百次差不多了，如果要结果更加准确可以训练更多
             if i:
                 loss.backward()#将误差返回给模型
@@ -283,11 +321,11 @@ if 'model_Net' in flag:
     net.load_state_dict(torch.load("nn1.pkl"))
     
     prediction=net(x_train_float)
-    plt.plot(x_train_float.view(-1).tolist(), prediction.view(-1).tolist(), label='BPNN回归训练', color='black')
+    plt.plot(x_train_float.view(-1).tolist(), prediction.view(-1).tolist(), label='BPNN回归', color='cyan')
     #plt.plot(x_test, y_predict_poly3, label='Net回归预测', color='red', linestyle='-.')
     
     prediction=net(x_test_float)
-    plt.plot(x_test_float.view(-1).tolist(), prediction.view(-1).tolist(), label='BPNN回归预测', color='black', linestyle='-.')
+    plt.plot(x_test_float.view(-1).tolist(), prediction.view(-1).tolist(), color='cyan')
     
     flag_legend += 1
     
@@ -323,10 +361,10 @@ if 'model_LSTM' in flag:
     
     prediction = net(x_train_float3d)
     print("h_state", h_state)
-    plt.plot(x_train_float3d.view(-1).tolist(), prediction.view(-1).tolist(), label='LSTM回归训练', color="green", linewidth=2.0)
+    plt.plot(x_train_float3d.view(-1).tolist(), prediction.view(-1).tolist(), label='LSTM回归', color="green", linewidth=2.0)
     
     prediction = net(x_test_float3d)
-    plt.plot(x_test_float3d.view(-1).tolist(), prediction.view(-1).tolist(), label='LSTM回归预测', color='green', linewidth=2.0, linestyle='-.')
+    plt.plot(x_test_float3d.view(-1).tolist(), prediction.view(-1).tolist(), color='green', linewidth=2.0)
     
     flag_legend += 1
     
@@ -465,7 +503,7 @@ if 'model_CNN2' in flag:
     prediction = None
     
     prediction=net(y_train2_cnn)
-    plt.plot(x_train2_cnn, prediction.view(-1).tolist(), label='CNN回归训练', color="red", linewidth=2.0)
+    plt.plot(x_train2_cnn, prediction.view(-1).tolist(), label='CNN回归', color="red", linewidth=2.0)
     
     prediction_test_list = []
     
@@ -482,7 +520,7 @@ if 'model_CNN2' in flag:
         #plt.scatter(list([i+64]), prediction.view(-1).tolist(), color="green")
         prediction_test_list.extend(prediction.view(-1).tolist())
         
-    plt.plot(list(range(tl, tl+len(prediction_test_list))), prediction_test_list, label='CNN回归测试', color="red", linewidth=2.0, linestyle='-.')
+    plt.plot(list(range(tl, tl+len(prediction_test_list))), prediction_test_list, color="red", linewidth=2.0)
     
     flag_legend += 1
     
