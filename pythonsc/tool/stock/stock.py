@@ -57,6 +57,7 @@ def split_sequence(list, percent):
     x2 = list[a:]
     return x1, x2
 
+font = {'family':'SimHei', 'weight':'normal', 'size':10} #字体设置方式2，可显示中文字体
 
 stocks = [
     {'No':0, 'code': '600036', 'name':'招商', 'trainTimes': 1000, 'lr': 0.0000155, 'split_ratio': 0.8 },
@@ -65,6 +66,11 @@ stocks = [
     {'No':3, 'code': '00700', 'name':'腾讯', 'trainTimes': 100, 'lr': 0.000000001, 'split_ratio': 0.8 },
     {'No':4, 'code': '03690', 'name':'美团', 'trainTimes': 100, 'lr': 0.000000001, 'split_ratio': 0.8 },
     {'No':5, 'code': 'PDD', 'name':'拼多多', 'trainTimes': 100, 'lr': 0.000000001, 'split_ratio': 0.8 },
+    {'No':6, 'code': '000001', 'name':'上证指数', 'trainTimes': 100, 'lr': 0.000000001, 'split_ratio': 0.8 },
+    {'No':7, 'code': '000300', 'name':'沪生300', 'trainTimes': 100, 'lr': 0.000000001, 'split_ratio': 0.8 },
+    {'No':8, 'code': '399001', 'name':'深证成指', 'trainTimes': 100, 'lr': 0.000000001, 'split_ratio': 0.8 },
+    {'No':9, 'code': '399005', 'name':'中小板指', 'trainTimes': 100, 'lr': 0.000000001, 'split_ratio': 0.8 },
+    {'No':10, 'code': '399006', 'name':'创业板指', 'trainTimes': 100, 'lr': 0.000000001, 'split_ratio': 0.8 },
     {'code': '', 'name':'' },
     {'code': '', 'name':'' },
     {'code': '', 'name':'' },
@@ -72,10 +78,91 @@ stocks = [
     {'code': '', 'name':'' }
     ]
 
-stock = stocks[2]
-flag = ['model_CNN2']
-flag_train = ['model_CNN2']
+plt.figure(figsize=(20,40),dpi=100)
 
+
+see_stocks = [6, 7, 8, 9, 10, 0, 1, 2]
+#see_stocks = [6, 7]
+stocks_data = []
+si=1
+for s in see_stocks:
+    stock = stocks[s]
+    reader = csv.reader(open('../../data/stock-ss/'+stock['code']+'.csv'))
+    data = []
+    i=0
+    for r in reader:
+        #print(r)
+        data.append(r)
+        i+=1
+        if i > 2000:
+            break;
+    del data[0]
+    data.reverse() #倒序list内所有元素
+    stocks_data.append(data)
+    
+    data_array = np.array(data)
+    
+    #plt.subplot(len(see_stocks),1,si);
+
+    y_full = data_array[:, 6:7].astype(float).flatten()
+    x_full = np.arange(len(data_array))
+    plt.plot(x_full, y_full, label=stock['name'])
+    
+    y_full_max, y_full_min=y_full.max(), y_full.min()
+    
+    
+    ds = data_array[:, 0]
+    dslist = []
+    for d in ds:
+        dslist.append(d[5:])
+    yearEnds=np.argwhere(np.array(dslist)=='12-27')
+    
+    for ye in yearEnds:
+        plt.plot([ye[0], ye[0]], [y_full_min, y_full_max], linestyle='--')
+        plt.text(ye[0], y_full_min, data_array[ye[0]][0])
+        
+    for yi in range(len(yearEnds)+1):
+        #Find index of max and min in the year
+        if yi==0:
+            y_max_idx, y_min_idx = np.argmax(y_full[ : yearEnds[yi, 0]]), np.argmin(y_full[ : yearEnds[yi, 0]])
+        elif yi==len(yearEnds):
+            y_max_idx, y_min_idx = np.argmax(y_full[yearEnds[yi-1, 0] : ]) + yearEnds[yi-1, 0], np.argmin(y_full[yearEnds[yi-1, 0] : ]) + yearEnds[yi-1, 0]
+        else:
+            y_max_idx, y_min_idx = np.argmax(y_full[yearEnds[yi-1, 0] : yearEnds[yi, 0]]) + yearEnds[yi-1, 0], np.argmin(y_full[yearEnds[yi-1, 0] : yearEnds[yi, 0]]) + yearEnds[yi-1, 0]
+        
+        #Get value of max and min in the year
+        y_max_val, y_min_val = y_full[y_max_idx], y_full[y_min_idx]
+        full_delta = (y_full_max - y_full_min) * 0.1
+        
+        if y_min_idx <= y_max_idx:
+            y_delta = round(y_max_val - y_min_val, 2)
+        else:
+            y_delta = -(y_max_val - y_min_val)
+        y_per = round(y_delta / y_min_val * 100, 2)
+        
+        #Plot position of max and min in the year
+        plt.plot([y_max_idx, y_max_idx], [y_max_val-full_delta, y_max_val+full_delta], color='red')
+        plt.plot([y_min_idx, y_min_idx], [y_min_val-full_delta, y_min_val+full_delta], color='green')
+        
+        #Print max and min value, and the delta and percentage
+        plt.text(y_max_idx, y_max_val+full_delta+20, data_array[y_max_idx][0])
+        plt.text(y_max_idx, y_max_val+full_delta-20, y_max_val)
+        
+        plt.text(y_min_idx, y_min_val-full_delta+20, data_array[y_min_idx][0])
+        plt.text(y_min_idx, y_min_val-full_delta-20, y_min_val)
+        
+        plt.text((y_max_idx - y_min_idx)/2+y_min_idx, y_min_val+full_delta+20, y_delta)
+        plt.text((y_max_idx - y_min_idx)/2+y_min_idx, y_min_val+full_delta-20, str(y_per)+'%')
+        
+    
+    plt.legend(loc='upper left', prop=font)
+    si+=1
+
+
+stock = stocks[10]
+flag = ['model_CNN2x']
+flag_train = ['model_CNN2']
+'''
 reader = csv.reader(open('../../data/stock-ss/'+stock['code']+'.csv'))
 data = []
 i=0
@@ -83,14 +170,14 @@ for r in reader:
     #print(r)
     data.append(r)
     i+=1
-    if i > 200:
+    if i > 2000:
         break;
 del data[0]
 data.reverse() #倒序list内所有元素
 
 data_array = np.array(data)
 
-plt.figure(figsize=(20,8),dpi=100)
+
 
 y_full = data_array[:, 6:7].astype(float).flatten()
 #x_full = len(data_array)-np.arange(len(data_array))
@@ -113,7 +200,7 @@ x_test_float3d = x_test_float.reshape(1, -1, 1)
 plt.plot(x_full, y_full, label='Open')
 plt.plot(x_full, data_array[:, 3:4].astype(float).flatten(), label='Close')
 #plt.plot(99-np.arange(100), data_array[0:100, 6:7].astype(float).flatten())
-
+'''
 '''
 y1 = [4,5,6]
 y2 = [2,3,3]
@@ -186,6 +273,6 @@ if 'model_CNN2' in flag:
 
 
 
-plt.legend()
+plt.legend(prop=font)
 plt.show()
 
