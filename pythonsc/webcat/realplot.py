@@ -30,6 +30,7 @@ from torch import nn
 import torch.nn.functional as F
 import numpy as np
 import matplotlib.pyplot as plt
+import sklearn.metrics as ms
 
 from pymysql import *
 
@@ -144,12 +145,13 @@ flag_legend = 0
 legend_loc1 = 'upper left'
 legend_loc2 = 'lower left'
 default_split_ratio=0.8;
+v_start, v_end = 0, -1
 
 plt.figure(figsize=(8,7), dpi=100) #横坐标和纵坐标都放大了10倍，分辨率为80个像素,dpi越大图像越清晰
 
 #area='玻利维亚';legend_loc=legend_loc2; area_code='BOL'; cnn2_train=550; cnn2_lr=0.000000007;text_y_max=2000;text_y_min=-1000; 
 area='美国';    legend_loc=legend_loc1; area_code='USA'; cnn2_train=150; cnn2_lr=0.0000000000083; text_y_max=380000;text_y_min=0; split_ratio=default_split_ratio;
-area='印度';   legend_loc=legend_loc2; area_code='IND'; cnn2_train=150; cnn2_lr=0.0000000000005; text_y_max=130000;text_y_min=-50000; split_ratio=default_split_ratio;
+#area='印度';   legend_loc=legend_loc2; area_code='IND'; cnn2_train=150; cnn2_lr=0.0000000000005; text_y_max=130000;text_y_min=-50000; split_ratio=default_split_ratio;
 #area='俄罗斯'; legend_loc=legend_loc1; area_code='RUS'; cnn2_train=150; cnn2_lr=0.0000000008; text_y_max=40000;text_y_min=0; split_ratin=default_split_ratio;
 #area='尼泊尔'; legend_loc=legend_loc1; area_code='NPL'; cnn2_train=550; cnn2_lr=0.000000000042; text_y_max=5500;text_y_min=0; split_ratio=default_split_ratio;
 #area='意大利'; legend_loc=legend_loc1; area_code='ITA'; cnn2_train=150; cnn2_lr=0.000000000008; text_y_max=48000;text_y_min=-5000; split_ratio=0.9; #如果在拐点处划分，那模型将无法准确预测将来。
@@ -157,7 +159,7 @@ area='印度';   legend_loc=legend_loc2; area_code='IND'; cnn2_train=150; cnn2_l
 sql1 = f"""
 	SELECT DATE_FORMAT(business_date, '%Y%m%d') business_date, new_confirmed, @rn:=@rn+1 rn,  DATE_FORMAT(business_date, '%m%d') biz_md
 	FROM fact_covid t, (SELECT @rn:=0) r 
-	WHERE AREA='{area}'
+	WHERE AREA='{area}' AND new_confirmed<>0
 	ORDER BY business_date
 """
 cs1.execute(sql1)
@@ -176,7 +178,7 @@ sql_xticks = f"""
 SELECT * FROM (
 	SELECT DATE_FORMAT(business_date, '%Y%m%d') business_date, new_confirmed, @rn:=@rn+1 rn,  DATE_FORMAT(business_date, '%b-%d') biz_md
 	FROM fact_covid t, (SELECT @rn:=0) r 
-	WHERE AREA='玻利维亚'
+	WHERE AREA='{area}' AND new_confirmed<>0
 	ORDER BY business_date
 ) t WHERE rn%22=0
 """
@@ -240,6 +242,14 @@ if 'model_LR' in flag:
     
     plt.plot(x_train, model_LR.predict(x_train), label='一元一次线性回归', color='green')
     plt.plot(x_test, y_predict, color='green')
+    
+    #Verify model
+    y_test_verify = y_test.flatten()[v_start : v_end]
+    y_predict_verify = y_predict.flatten()[v_start : v_end]
+    mae_LR = ms.mean_absolute_error(y_test_verify, y_predict_verify)
+    mape_LR = sum(np.abs((y_test_verify - y_predict_verify)/y_test_verify))/len(y_test_verify)*100
+    r2_score_LR = ms.r2_score(y_test_verify, y_predict_verify)
+    
     flag_legend += 1
 
 if 'model_LR2' in flag:
@@ -254,6 +264,14 @@ if 'model_LR2' in flag:
     plt.plot(x_train, model_LR_poly.predict(x_train_poly), label='一元二次非线性回归', color='darkorange')
     plt.plot(x_test, y_predict_poly, color='darkorange')
     #plt.plot(x_future, y_future_predict, label='LR', color='red')
+    
+    #Verify model
+    y_test_verify = y_test.flatten()[v_start : v_end]
+    y_predict_verify = y_predict_poly.flatten()[v_start : v_end]
+    mae_LR2 = ms.mean_absolute_error(y_test_verify, y_predict_verify)
+    mape_LR2 = sum(np.abs((y_test_verify - y_predict_verify)/y_test_verify))/len(y_test_verify)*100
+    r2_score_LR2 = ms.r2_score(y_test_verify, y_predict_verify)
+    
     flag_legend += 1
     
 if 'model_LR3' in flag:
@@ -268,6 +286,14 @@ if 'model_LR3' in flag:
     plt.plot(x_train, model_LR_poly3.predict(x_train_poly3), label='一元三次非线性回归', color='fuchsia')
     plt.plot(x_test, y_predict_poly3, color='fuchsia')
     #plt.plot(x_future, y_future_predict, label='LR', color='red')
+    
+    #Verify model
+    y_test_verify = y_test.flatten()[v_start : v_end]
+    y_predict_verify = y_predict_poly3.flatten()[v_start : v_end]
+    mae_LR3 = ms.mean_absolute_error(y_test_verify, y_predict_verify)
+    mape_LR3 = sum(np.abs((y_test_verify - y_predict_verify)/y_test_verify))/len(y_test_verify)*100
+    r2_score_LR3 = ms.r2_score(y_test_verify, y_predict_verify)
+    
     flag_legend += 1
     
 if 'model_KNN' in flag:
@@ -298,7 +324,7 @@ if 'model_svm' in flag:
     
 if 'model_BPNN' in flag:
     net=Net(1,800, 1)#我假设一个输入，隐藏层里有50个神经元，和一个输出
-    print('Net的网络体系结构为：', net)
+    #print('Net的网络体系结构为：', net)
     optimizer=torch.optim.Adam(net.parameters(),0.1)#定义优化器
     loss_func=torch.nn.MSELoss()#训练出来的结果和实际对比
     
@@ -309,8 +335,8 @@ if 'model_BPNN' in flag:
                 optimizer.step()#建模型的数据更新
             prediction=net(x_train_float)#将数据放入放入模型中
             loss=loss_func(prediction,y_train_float)#把模拟的结果和实际的差计算出来
-            if i%200==0:
-                print("i={}, Loss: {}".format( i, loss))
+            #if i%200==0:
+            #    print("i={}, Loss: {}".format( i, loss))
             optimizer.zero_grad()
         #将上一步计算的梯度清零，因为他计算的时候梯度会累加，这样会导致结果不准
         
@@ -326,6 +352,13 @@ if 'model_BPNN' in flag:
     
     prediction=net(x_test_float)
     plt.plot(x_test_float.view(-1).tolist(), prediction.view(-1).tolist(), color='cyan')
+    
+    #Verify model
+    y_test_verify = y_test.flatten()[v_start : v_end]
+    y_predict_verify = prediction.view(-1).tolist()[v_start : v_end]
+    mae_bpnn = ms.mean_absolute_error(y_test_verify, y_predict_verify)
+    mape_bpnn = sum(np.abs((y_test_verify - y_predict_verify)/y_test_verify))/len(y_test_verify)*100
+    r2_score_bpnn = ms.r2_score(y_test_verify, y_predict_verify)
     
     flag_legend += 1
     
@@ -474,7 +507,7 @@ if 'model_CNN2' in flag:
     LEN = lx
     
     net = CNN_Series(LEN, 80, 32, 1)
-    print('Net的网络体系结构为：', net)
+    #print('Net的网络体系结构为：', net)
     optimizer = torch.optim.SGD(net.parameters(), lr=cnn2_lr)#India
     loss_func = nn.MSELoss()
     
@@ -522,7 +555,26 @@ if 'model_CNN2' in flag:
         
     plt.plot(list(range(tl, tl+len(prediction_test_list))), prediction_test_list, color="red", linewidth=2.0)
     
+    #Verify model
+    y_test_verify = y_test.flatten()[v_start : v_end]
+    y_predict_verify = prediction_test_list[v_start : v_end]
+    mae_cnn2 = ms.mean_absolute_error(y_test_verify, y_predict_verify)
+    mape_cnn2 = sum(np.abs((y_test_verify - y_predict_verify)/y_test_verify))/len(y_test_verify)*100
+    r2_score_cnn2 = ms.r2_score(y_test_verify, y_predict_verify)
+    
     flag_legend += 1
+    
+print(f'Verify model for {area} - predict {v_end - v_start} days:')
+if 'model_LR' in flag:
+    print(f'LR\t\tMAE={round(mae_LR,2)},\t\tMAPE={round(mape_LR,2)}%,\t\tR2_Score={r2_score_LR}')
+if 'model_LR2' in flag:  
+    print(f'LR2\t\tMAE={round(mae_LR2,2)},\t\tMAPE={round(mape_LR2,2)}%,\t\tR2_Score={r2_score_LR2}')
+if 'model_LR3' in flag:  
+    print(f'LR3\t\tMAE={round(mae_LR3,2)},\t\tMAPE={round(mape_LR3,2)}%,\t\tR2_Score={r2_score_LR3}')
+if 'model_BPNN' in flag:  
+    print(f'BPNN\tMAE={round(mae_bpnn,2)},\t\tMAPE={round(mape_bpnn,2)}%,\t\tR2_Score={r2_score_bpnn}')
+if 'model_CNN2' in flag:  
+    print(f'CNN\t\tMAE={round(mae_cnn2,2)},\t\tMAPE={round(mape_cnn2,2)}%,\t\tR2_Score={r2_score_cnn2}')
     
 if flag_legend_on and flag_legend > 0:
     #plt.rcParams['font.sans-serif']=['Simhei']  #解决图例中文显示问题，目前只知道黑体可行
