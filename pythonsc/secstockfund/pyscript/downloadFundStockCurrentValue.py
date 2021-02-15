@@ -1,6 +1,9 @@
 #Capture stock current data and update into DB
 from fhsechead import *
 
+logFile='C:/fh/testenv1/sec/fund-updatefundtrend.log'
+fLog = LogWriter(logFile)
+
 currentDate = time.strftime("%Y%m%d", time.localtime())
 
 def downloadStockCurrent(stockCodeList):
@@ -27,10 +30,10 @@ def downloadStockCurrent(stockCodeList):
                     """
                 rowcount = cs1.execute(sqlUpdatePrice)
             else:
-                print(f"No data - {stock}")
+                fLog.writeLog(f"No data - {stock}")
         conn.commit()
     except Exception as e:
-        print(f"Exception msg: {e}")
+        fLog.writeLog(f"Exception msg: {e}")
         return -1
     
     return 0
@@ -49,9 +52,9 @@ def stockCurrentMain():
         stockCodeList.append(r[0])
     batchUnit = 500
     for i in range(math.ceil(len(stockCodeList)/batchUnit)):
-        print(f"Update stock price for {0+i*batchUnit} - {batchUnit*(i+1)}:")
+        fLog.writeLog(f"Update stock price for {0+i*batchUnit} - {batchUnit*(i+1)}:")
         status = downloadStockCurrent(stockCodeList[0+i*batchUnit:batchUnit*(i+1)])
-        print(f"Call downloadStockCurrent() status={status}")
+        fLog.writeLog(f"Call downloadStockCurrent() status={status}")
 
 
 #Capture fund current data and update into DB
@@ -72,7 +75,7 @@ def downloadFundCurrent(fundCode):
         rowcount = cs1.execute(sqlUpdatePrice)
         conn.commit()
     except Exception as e:
-        print(e)
+        fLog.writeLog(e)
         return -1
     
     return 0
@@ -98,7 +101,7 @@ def fundCurrentMain():
         fundCodeList.append(r[0])
     for fundCode in fundCodeList:
         status = downloadFundCurrent(fundCode)
-        print(f"Call downloadStockCurrent() status={status}")
+        fLog.writeLog(f"Call downloadStockCurrent() status={status}")
 
 if __name__ == "__main__":
     stockCurrentMain()
@@ -106,3 +109,4 @@ if __name__ == "__main__":
     
     cs1.close()
     conn.close()
+    fLog.close()

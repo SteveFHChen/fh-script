@@ -2,13 +2,7 @@
 from fhsechead import *
 
 logFile='C:/fh/testenv1/sec/drawFigure.log'
-fLog=open(logFile, 'a+')
-
-def writeLog(msg):
-    msgx = f'\n[{time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}] {msg}'
-    print(msgx)
-    fLog.writelines([msgx])
-    fLog.flush()
+fLog = LogWriter(logFile)
 
 font = {'family':'SimHei', 'weight':'normal', 'size':12} #字体设置方式2，可显示中文字体
 legend_loc = 'upper left'
@@ -17,7 +11,7 @@ fundHistory = {}
 def drawFigure(fundList):
     plt.figure(figsize=(15, len(fundList)*5), dpi=100)
     for index, fund in enumerate(fundList):
-        writeLog(f"Start to draw figure {index}/{len(fundList)} - {fund}")
+        fLog.writeLog(f"Start to draw figure {index}/{len(fundList)} - {fund}")
         #index, fund = 0, {'fundCode': '003834', 'fundName': '华夏能源革新股票'}
         sqlMaxNetDate = f"""
             SELECT FROM_UNIXTIME(MAX(net_date)/1000, '%Y-%m-%d') net_date
@@ -134,3 +128,4 @@ if __name__ == "__main__":
 
     cs1.close()
     conn.close()
+    fLog.close()

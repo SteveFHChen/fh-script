@@ -6,13 +6,7 @@ currentDate = time.strftime("%Y%m%d", time.localtime())
 savePath="C:/fh/testenv1/sec/"
 
 logFile='C:/fh/testenv1/sec/stock.log'
-fLog=open(logFile, 'a+')
-
-def writeLog(msg):
-    msgx = f'[{time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}] {msg}'
-    print(msgx)
-    fLog.writelines(['\n'+msgx])
-    fLog.flush()
+fLog = LogWriter(logFile)
 
 driver = webdriver.Chrome(executable_path=chromeDriverExe, chrome_options=chrome_options)
 driver.set_page_load_timeout(40)
@@ -20,15 +14,15 @@ driver.set_page_load_timeout(40)
 def captureFenghuangSecSectionCategory(dataFile, forceRecover=False):
     if forceRecover==False:
         if os.path.exists(dataFile)==True:
-            writeLog(f"Data file already exists. {dataFile}")
+            fLog.writeLog(f"Data file already exists. {dataFile}")
             return
     else:
-        writeLog(f"Data file not exists, capturing from internet...")
+        fLog.writeLog(f"Data file not exists, capturing from internet...")
     
     try:
         driver.get("http://app.finance.ifeng.com/hq/list.php?type=stock_a&class=zs") 
     except:
-        writeLog(f'Loading page timeout.')
+        fLog.writeLog(f'Loading page timeout.')
 
     jsSecTypeList = """
         secTypeList = [];
@@ -116,13 +110,13 @@ def updateFenghuangSecSectionCategory(dataFile):
     f1.close()
 
     for secType in s1:
-        writeLog(secType['secType'])
+        fLog.writeLog(secType['secType'])
         
         if secType['secType']=="基金":
             continue
         
         for secSubType in secType['secSubType']:
-            writeLog(f"|----{secSubType['secSubType']}[{len(secSubType['object'])}]")
+            fLog.writeLog(f"|----{secSubType['secSubType']}[{len(secSubType['object'])}]")
             
             successIndicate = 0
             for obj in secSubType['object']:
@@ -135,7 +129,7 @@ def updateFenghuangSecSectionCategory(dataFile):
                 rowcount = cs1.execute(sqlIndicate)
                 successIndicate = successIndicate + rowcount
             conn.commit()
-            writeLog(f"     Success indicated [{successIndicate}] objects, no update [{len(secSubType['object']) - successIndicate}].")
+            fLog.writeLog(f"     Success indicated [{successIndicate}] objects, no update [{len(secSubType['object']) - successIndicate}].")
             #time.sleep(5)
 
 #Capture stock section and category, and fill into DB
@@ -145,12 +139,12 @@ def captureSohuSecSectionCategory(dataFile, forceRecover=False):
             print("Data file already exists. {dataFile}")
             return
     else:
-        writeLog(f"Data file not exists, capturing from internet...")
+        fLog.writeLog(f"Data file not exists, capturing from internet...")
     
     try:
         driver.get("https://q.stock.sohu.com/cn/bk.shtml")
     except:
-        writeLog(f'Loading page timeout, company is {company}.')
+        fLog.writeLog(f'Loading page timeout, company is {company}.')
         
     stockSectionCategoryList={"shared": NULL, "industry": NULL, "region": NULL, "concept": NULL}
     sectionListLi=driver.find_elements(By.CSS_SELECTOR,"ul#BIZ_MS_phTab li")
@@ -181,18 +175,18 @@ def captureSohuSecSectionCategory(dataFile, forceRecover=False):
         
     for key in stockSectionCategoryList.keys():
         cnt = len(stockSectionCategoryList[key])
-        writeLog(f"{key} - {cnt}")
+        fLog.writeLog(f"{key} - {cnt}")
 
     for key in stockSectionCategoryList.keys():
         #key = 'region'
         cnt = len(stockSectionCategoryList[key])
-        writeLog(f"Start to capture section {key} - {cnt}")
+        fLog.writeLog(f"Start to capture section {key} - {cnt}")
         for category in stockSectionCategoryList[key]:
             #industry = stockSectionCategoryList['industry'][0]
             try:
                 driver.get(category['url']) 
             except:
-                writeLog(f"Loading page timeout, company is {category['name']}.")
+                fLog.writeLog(f"Loading page timeout, company is {category['name']}.")
             
             jsStockList = """
                 stockList = [];
@@ -232,7 +226,7 @@ def updateSohuSecSectionCategory(dataFile):
                 VALUES {values}
                 """
             rowcount = cs1.execute(sqlInsertSection)
-            writeLog(f"Stock section {sectionName} - {category['name']} insert {rowcount}.")
+            fLog.writeLog(f"Stock section {sectionName} - {category['name']} insert {rowcount}.")
             conn.commit()
 
 if __name__ == "__main__":

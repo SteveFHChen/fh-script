@@ -1,6 +1,9 @@
 #Capture fund and company mapping, and fill into DB
 from fhsechead import *
 
+logFile='C:/fh/testenv1/sec/fund-updatefundtrend.log'
+fLog = LogWriter(logFile)
+
 driver = webdriver.Chrome(executable_path="C:/fh/testenv1/chromedriver.exe")
 driver.set_page_load_timeout(40)
 
@@ -14,7 +17,7 @@ def captureFundCompanyMapping():
         try:
             driver.get(f"http://fund.eastmoney.com/Company/{companyCode}.html") 
         except:
-            print(f'{time.ctime()} Loading page timeout, company is {company}.')
+            fLog.writeLog(f'Loading page timeout, company is {company}.')
         
         jsFundCompanyMapping = f"""
             fundCompanyMapping = {{"companyCode":"{companyCode}", "fundList":[]}}
@@ -32,9 +35,9 @@ def captureFundCompanyMapping():
             """
         rowcount = cs1.execute(sqlUpdateFundCompanyMapping)
         conn.commit()
-        print(f"{time.ctime()} company {companyCode}-{companyName} has {len(fundCompanyMapping['fundList'])} funds in internet, updated {rowcount} funds in DB.")
+        fLog.writeLog(f"Company {companyCode}-{companyName} has {len(fundCompanyMapping['fundList'])} funds in internet, updated {rowcount} funds in DB.")
 
-    print(f"{time.ctime()} Update company:fund mapping for {len(fundCompanyList)} companies completed.")
+    fLog.writeLog(f"Update company:fund mapping for {len(fundCompanyList)} companies completed.")
 
 if __name__ == "__main__":
     captureFundCompanyMapping()
@@ -42,3 +45,4 @@ if __name__ == "__main__":
     cs1.close()
     conn.close()
     driver.close()
+    fLog.close()

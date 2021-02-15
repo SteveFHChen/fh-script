@@ -37,13 +37,7 @@ savePath = "C:/fh/testenv1/sec/cat20210130"
 #savePath = "C:/fh/testenv1/sec/cat20210210"
 
 logFile='C:/fh/testenv1/sec/fund-updatefundtrend.log'
-fLog=open(logFile, 'a+')
-
-def writeLog(msg):
-    msgx = f'\n[{time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}] {msg}'
-    print(msgx)
-    fLog.writelines([msgx])
-    fLog.flush()
+fLog = LogWriter(logFile)
 
 #Using approach 1
 def downloadFund(fundCode):
@@ -96,7 +90,7 @@ def loadNetWorthTrend(jsContent):
                     """
                 rowcount = csx.execute(sql)
             else:
-                writeLog(f"break i={i}, fundCode={fundCode}")
+                fLog.writeLog(f"break i={i}, fundCode={fundCode}")
                 break;
         connx.commit()
         rstcode = 0
@@ -180,9 +174,9 @@ def loadFund2DB(fundCode, downloadIfNotExists=True):
         #if not, the download
         checkFile = os.path.isfile(srcDataFile)
         if checkFile==False:
-            writeLog(f"Start download fund info {fundCode}")
+            fLog.writeLog(f"Start download fund info {fundCode}")
             returnCode, srcDataFile = downloadFund(fundCode)
-            writeLog(f"Download fund info {fundCode} {'success.' if returnCode==0 else 'failed!'}")
+            fLog.writeLog(f"Download fund info {fundCode} {'success.' if returnCode==0 else 'failed!'}")
         
         #if yes, then load
         content = open(srcDataFile, "r").read()
@@ -230,24 +224,22 @@ if __name__ == "__main__":
     funds = cs1.fetchall()
     pool = multiprocessing.Pool(processes=5)
     for f in funds:
-        writeLog(f"Start load fund into DB {f[0]} - {f[1]}")
+        fLog.writeLog(f"Start load fund into DB {f[0]} - {f[1]}")
         try:
             #Way 1: single process
             #returnCode = loadFund2DB(f[0])
             #Way 2: multiprocessing
             #pool.apply_async(loadFund2DB, (f[0], ))
             pool.apply_async(analyzeFundLastNRate, (f[0], ))
-            writeLog(f"Load fund into DB {f[0]} {'success.' if returnCode==0 else 'failed!'}")
+            fLog.writeLog(f"Load fund into DB {f[0]} {'success.' if returnCode==0 else 'failed!'}")
         except Exception as e:
-            writeLog(f"Load fund into DB {f[0]} interrupt with exception {e}.")
+            fLog.writeLog(f"Load fund into DB {f[0]} interrupt with exception {e}.")
     pool.close()
     pool.join()
-    writeLog(f"All processes are completed, multiprocessing pool closed.")
+    fLog.writeLog(f"All processes are completed, multiprocessing pool closed.")
 
-    fLog.flush()
-    fLog.close()
-    
     cs1.close()
     conn.close()
     dbPool.close()
-    writeLog(f"All processes are completed, DB connection and DB pool connections are closed.")
+    fLog.writeLog(f"All processes are completed, DB connection and DB pool connections are closed.")
+    fLog.close()

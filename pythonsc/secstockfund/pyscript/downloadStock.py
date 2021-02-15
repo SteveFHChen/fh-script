@@ -2,24 +2,18 @@
 from fhsechead import *
 
 logFile='C:/fh/testenv1/sec/stock.log'
-fLog=open(logFile, 'a+')
-
-def writeLog(msg):
-    msgx = f'\n[{time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}] {msg}'
-    print(msgx)
-    fLog.writelines([msgx])
-    fLog.flush()
+fLog = LogWriter(logFile)
 
 #Capture all CN stock list, and save into DB
 def captureCNStocks():
-    writeLog("Start to capture CN stocks...")
+    fLog.writeLog("Start to capture CN stocks...")
     driver = webdriver.Chrome(executable_path=chromeDriverExe, chrome_options=chrome_options)
     driver.set_page_load_timeout(40)
 
     try:
         driver.get("http://www.yz21.org/stock/info/") # get接受url可以是如何网址，此处以百度为例
     except:
-        writeLog(f'Loading page timeout.')
+        fLog.writeLog(f'Loading page timeout.')
 
     jsPageNumber = """
         pages = document.querySelectorAll("div.pagestock a")
@@ -45,11 +39,11 @@ def captureCNStocks():
     for i in range(2, pageNumber+1):
     #for i in range(2, 4+1): #For testing
         url = f"http://www.yz21.org/stock/info/stocklist_{i}.html"
-        writeLog(f"Start capture page [{i}] {url}")
+        fLog.writeLog(f"Start capture page [{i}] {url}")
         try:
             driver.get(url)
         except:
-            writeLog(f'Loading page timeout.')
+            fLog.writeLog(f'Loading page timeout.')
         
         cnStockList=json.loads(driver.execute_script(jsCatCNStockList))
         for s in cnStockList:
@@ -66,17 +60,17 @@ def captureCNStocks():
             try:
                 rowcount = cs1.execute(sqlKeyCheck)
                 if rowcount>0:
-                    writeLog(f"Stock already exists {s['code']} - {s['name']}")
+                    fLog.writeLog(f"Stock already exists {s['code']} - {s['name']}")
                 else:
                     rowcount = cs1.execute(sqlAdd)
             except Exception as e:
-                writeLog(f"Failed add: {s}")
-                writeLog(f"Exception msg: {e}")
+                fLog.writeLog(f"Failed add: {s}")
+                fLog.writeLog(f"Exception msg: {e}")
         conn.commit()
-        writeLog(f"Completed capture page [{i}].")
+        fLog.writeLog(f"Completed capture page [{i}].")
 
     driver.close()
-    writeLog("Finished capture CN stocks.")
+    fLog.writeLog("Finished capture CN stocks.")
 
 #Capture all US stock list, and save into DB
 def captureUSStocks():
@@ -86,7 +80,7 @@ def captureUSStocks():
     try:
         driver.get("http://quote.eastmoney.com/usstocklist.html") # get接受url可以是如何网址，此处以百度为例
     except:
-        writeLog(f'Loading page timeout.')
+        fLog.writeLog(f'Loading page timeout.')
 
     jsCatUSStockList = """
         usStockaList = document.querySelectorAll("div#quotesearch ul li a")
@@ -116,11 +110,11 @@ def captureUSStocks():
         try:
             rowcount = cs1.execute(sqlKeyCheck)
             if rowcount>0:
-                writeLog(f"Stock already exists {s['code']} - {s['title']}")
+                fLog.writeLog(f"Stock already exists {s['code']} - {s['title']}")
             else:
                 rowcount = cs1.execute(sqlAdd)
         except Exception as e:
-            writeLog("Failed add: {s}")
+            fLog.writeLog("Failed add: {s}")
     conn.commit()
     driver.close()
 
@@ -132,7 +126,7 @@ def captureHKStocks():
     try:
         driver.get("http://app.finance.ifeng.com/hq/list.php?type=hkstock") # get接受url可以是如何网址，此处以百度为例
     except:
-        writeLog(f'Loading page timeout.')
+        fLog.writeLog(f'Loading page timeout.')
 
     jsCatHKStockList = """
         stockList = []
@@ -166,11 +160,11 @@ def captureHKStocks():
         try:
             rowcount = cs1.execute(sqlKeyCheck)
             if rowcount>0:
-                writeLog(f"Stock already exists {s['code']} - {s['title']}")
+                fLog.writeLog(f"Stock already exists {s['code']} - {s['title']}")
             else:
                 rowcount = cs1.execute(sqlAdd)
         except Exception as e:
-            writeLog("Failed add: {s}")
+            fLog.writeLog("Failed add: {s}")
     conn.commit()
     driver.close()
 
@@ -183,7 +177,7 @@ def downloadMissingStock(stockList, stockList2i):
     content = res.text
     for index, line in enumerate(content.split("\n")[:-1]):
         stockInfoStr = js2py.eval_js(line)
-        writeLog(f"{stockList[index]} - {stockInfoStr}")
+        fLog.writeLog(f"{stockList[index]} - {stockInfoStr}")
         stockInfo = stockInfoStr.split(",")
         if len(stockInfo)>=6:
             sqlAddStock = f"""
@@ -225,11 +219,11 @@ def downloadMissingStockMain():
         
     batchUnit = 10
     for i in range(math.ceil(len(stockList2)/batchUnit)):
-        writeLog(f"Download missing stocks for {0+i*batchUnit} - {batchUnit*(i+1)}:")
+        fLog.writeLog(f"Download missing stocks for {0+i*batchUnit} - {batchUnit*(i+1)}:")
         status = downloadMissingStock(
             stockList[0+i*batchUnit:batchUnit*(i+1)], 
             stockList2[0+i*batchUnit:batchUnit*(i+1)])
-        writeLog(f"Call downloadMissingStock() status={status}")
+        fLog.writeLog(f"Call downloadMissingStock() status={status}")
 
 if __name__ == "__main__":
     captureCNStocks()

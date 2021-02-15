@@ -2,13 +2,7 @@
 from fhsechead import *
 
 logFile='C:/fh/testenv1/sec/fund.log'
-fLog=open(logFile, 'a+')
-
-def writeLog(msg):
-    msgx = f'\n[{time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}] {msg}'
-    print(msgx)
-    fLog.writelines([msgx])
-    fLog.flush()
+fLog = LogWriter(logFile)
 
 driver = webdriver.Chrome(executable_path=chromeDriverExe, chrome_options=chrome_options)
 driver.set_page_load_timeout(40)
@@ -16,12 +10,12 @@ driver.set_page_load_timeout(40)
 def updateFundPositionShares(fundCodeList):
     #for fundCode in fundCodeList:
     for index, fundCode in enumerate(fundCodeList):
-        writeLog(f"Start to update fund position shares {index}/{len(fundCodeList)} - {fundCode}")
+        fLog.writeLog(f"Start to update fund position shares {index}/{len(fundCodeList)} - {fundCode}")
         #fundCode = fundCodeList[0]
         try:
             driver.get(f"http://fund.eastmoney.com/{fundCode}.html") # get接受url可以是如何网址，此处以百度为例
         except:
-            writeLog(f'Loading page timeout, fund code is {fundCode}.')
+            fLog.writeLog(f'Loading page timeout, fund code is {fundCode}.')
         
         jsFundPositionShares = """
             positionShares = []
@@ -53,7 +47,7 @@ def updateFundPositionShares(fundCodeList):
                 """
             rowcount = cs1.execute(sqlUpdateFundPositionShares)
         conn.commit()
-        writeLog(f"Fund {fundCode} position shares has been updated in DB.")
+        fLog.writeLog(f"Fund {fundCode} position shares has been updated in DB.")
 
 if __name__ == "__main__":
     sqlFundStockList = f"""

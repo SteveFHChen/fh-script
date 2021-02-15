@@ -25,12 +25,14 @@ import re
 import json
 
 mainScript = sys.argv[0]
-mainPath = mainScript[:mainScript.rfind("/")+1]
+endSlashIndex = mainScript.rfind("/", 0, mainScript.rfind("/")-1)
+mainPath = mainScript[:endSlashIndex+1]
 print(f"mainScript: [{mainScript}]")
 print(f"mainPath: [{mainPath}]")
 
 sys.path.append(mainPath+'../utils')
 import logger as lg
+from LogWriter import *
 from properties import *
 #import dbutils as db
 from dbutils import *
