@@ -5,6 +5,7 @@ Created on Mon Feb 15 11:59:51 2021
 @author: steve
 """
 import time
+import os
 
 class LogWriter:
     def __init__(self, logFile):
@@ -12,7 +13,7 @@ class LogWriter:
         self.fLog = open(logFile, 'a+')
         
     def writeLog(self, msg):
-        msgx = f'\n[{time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}] {msg}'
+        msgx = f'\n[{time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}][{os.getpid()}] {msg}'
         print(msgx)
         self.fLog.writelines([msgx])
         self.fLog.flush()

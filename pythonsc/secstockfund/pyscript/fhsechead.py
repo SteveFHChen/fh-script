@@ -14,7 +14,14 @@ import js2py
 import os
 import os.path
 import time
+import datetime
 import sys
+
+def writeLog(msg):
+    msgx = f'\n[{time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}][{os.getpid()}] {msg}'
+    print(msgx)
+
+writeLog("Start to import fhsechead...")
 
 import math
 import numpy as np
@@ -23,12 +30,13 @@ import matplotlib.pyplot as plt
 import requests
 import re
 import json
+import csv
 
 mainScript = sys.argv[0]
 endSlashIndex = mainScript.rfind("/", 0, mainScript.rfind("/")-1)
 mainPath = mainScript[:endSlashIndex+1]
-print(f"mainScript: [{mainScript}]")
-print(f"mainPath: [{mainPath}]")
+writeLog(f"mainScript: [{mainScript}]")
+writeLog(f"mainPath: [{mainPath}]")
 
 sys.path.append(mainPath+'../utils')
 import logger as lg
@@ -49,4 +57,4 @@ headers = {'content-type': 'application/json',
 
 chromeDriverExe="C:/fh/testenv1/chromedriver.exe"
 
-print("Import fhsechead completed.")
+writeLog("Import fhsechead completed.")

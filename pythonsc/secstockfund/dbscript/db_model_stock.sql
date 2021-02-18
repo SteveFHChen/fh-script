@@ -23,7 +23,8 @@ ALTER TABLE sec_stock ADD COLUMN arrow VARCHAR(4);
 ALTER TABLE sec_stock ADD COLUMN open_price FLOAT;
 ALTER TABLE sec_stock ADD COLUMN high_price FLOAT;
 ALTER TABLE sec_stock ADD COLUMN low_price FLOAT;
-ALTER TABLE sec_stock ADD COLUMN volume INT;
+ALTER TABLE sec_stock ADD COLUMN volume BIGINT;
+ALTER TABLE sec_stock MODIFY COLUMN volume BIGINT;
 ALTER TABLE sec_stock ADD COLUMN percent FLOAT;
 
 ALTER TABLE sec_stock ADD COLUMN fh_mark VARCHAR(20);
@@ -31,6 +32,12 @@ ALTER TABLE sec_stock ADD COLUMN fh_mark VARCHAR(20);
 ALTER TABLE sec_stock CHANGE COLUMN fund_welcome fund_welcome_cnt INT;
 ALTER TABLE sec_stock ADD COLUMN fund_welcome_percent FLOAT;
 
+ALTER TABLE sec_stock DROP PRIMARY KEY;
+ALTER TABLE sec_stock ADD COLUMN stock_type VARCHAR(30) DEFAULT '股票'; /* 股票， 指数 */
+ALTER TABLE sec_stock ADD PRIMARY KEY(stock_type, stock_code);
+
+/* 0-上证, 1-深证. To improve system performance, and simplify SQL */
+ALTER TABLE sec_stock ADD COLUMN sh_sz_indicator VARCHAR(1);
 
 /* DROP TABLE sec_stock_type_v; */
 CREATE TABLE sec_stock_section_pivot(
@@ -46,4 +53,25 @@ ALTER TABLE sec_stock CHANGE COLUMN region_name region_code VARCHAR(20);#正确
 ALTER TABLE sec_stock ADD COLUMN subsection_name VARCHAR(20);
 ALTER TABLE sec_stock ADD COLUMN fund_welcome INT;
 
+#DROP TABLE sec_stock_history;
+CREATE TABLE sec_stock_history(
+	price_date DATE,
+	stock_code VARCHAR(20),
+	stock_name VARCHAR(50),
+	close_price FLOAT,
+	high_price FLOAT,
+	low_price FLOAT,
+	open_price FLOAT,
+	yest_close FLOAT,
+	delta_amount FLOAT, /*涨跌额*/
+	delta_percent FLOAT, /*涨跌幅*/
+	handover_rate FLOAT, /*换手率*/
+	trading_volume BIGINT, /*成交量*/
+	turnover_amount BIGINT, /*成交额*/
+	total_market_value BIGINT, /*市总值*/
+	circu_market_value BIGINT, /*流通市值*/
+	trading_lots INT, /*成交笔数*/
+	PRIMARY KEY(stock_code, price_date)
+);
+ALTER TABLE sec_stock_history MODIFY COLUMN trading_volume BIGINT;
 

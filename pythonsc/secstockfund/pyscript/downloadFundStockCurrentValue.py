@@ -1,5 +1,8 @@
 #Capture stock current data and update into DB
 from fhsechead import *
+from dbpoolutils import *
+
+import multiprocessing
 
 logFile='C:/fh/testenv1/sec/fund-updatefundtrend.log'
 fLog = LogWriter(logFile)
@@ -26,40 +29,78 @@ def downloadStockCurrent(stockCodeList):
                     UPDATE sec_stock
                     SET price_time='{stock['time']}', yest_close={stock['yestclose']}, now_price={stock['price']}, arrow='{stock['arrow']}', 
                         open_price={stock['open']}, high_price={stock['high']}, low_price={stock['low']}, volume={stock['volume']}, percent={stock['percent']}
-                    WHERE stock_code='{stockCode[1:]}'
+                    WHERE stock_code='{stockCode[1:]}' AND sh_sz_indicator='{stockCode[:1]}'
                     """
-                rowcount = cs1.execute(sqlUpdatePrice)
+                connx = dbPool.connection()
+                csx=connx.cursor()
+                rowcount = csx.execute(sqlUpdatePrice)
+                connx.commit()
+                
+                csx.close()
+                connx.close()
             else:
                 fLog.writeLog(f"No data - {stock}")
         conn.commit()
     except Exception as e:
-        fLog.writeLog(f"Exception msg: {e}")
+        fLog.writeLog(f"Call downloadStockCurrent() exception for stock={stockCodeListStr}, exception={e}")
         return -1
     
     return 0
 
+def stockCallback(status):
+    fLog.writeLog(f"Call downloadStockCurrent() finished status={status}")
+    
 def stockCurrentMain():
+    startTime = datetime.datetime.now()
+    sqlUpdateShSzIndicator = """
+        UPDATE sec_stock
+        SET sh_sz_indicator = CASE 
+            WHEN stock_type='指数' AND section_name='上证' THEN 0 
+            WHEN stock_type='指数' AND section_name='深证' THEN 1 
+            WHEN stock_type='股票' AND SUBSTRING(stock_code, 1, 1) IN ('0','2','3') THEN 1 
+            ELSE 0 END
+        WHERE region_code='CN' AND section_name<>'中证'
+        """
+    rowcount = cs1.execute(sqlUpdateShSzIndicator)
+    conn.commit()
+    fLog.writeLog(f"Updated stock SH_SZ_INDICATOR {rowcount} records.")
+    
     sqlStockCodeList = """
-        SELECT CONCAT(CASE WHEN SUBSTRING(stock_code, 1, 1) IN ('0','3') THEN 1 ELSE 0 END, stock_code) stock_code 
+        SELECT CONCAT(sh_sz_indicator, stock_code) stock_code 
         FROM sec_stock t 
-        WHERE region_code='CN' AND price_time IS NULL
+        WHERE region_code='CN' AND section_name<>'中证' 
         ORDER BY fund_welcome_cnt DESC
         """
+        # 股票代码前加前缀：上证加0, 深证加1，中证暂未知
+        #AND price_time IS NULL
+    
     rowcount = cs1.execute(sqlStockCodeList)
     records = cs1.fetchall()
     stockCodeList = []
     for r in records:
         stockCodeList.append(r[0])
+    
+    pool = multiprocessing.Pool(processes=5)
     batchUnit = 500
-    for i in range(math.ceil(len(stockCodeList)/batchUnit)):
+    batchs = math.ceil(len(stockCodeList)/batchUnit)
+    for i in range(batchs):
         fLog.writeLog(f"Update stock price for {0+i*batchUnit} - {batchUnit*(i+1)}:")
-        status = downloadStockCurrent(stockCodeList[0+i*batchUnit:batchUnit*(i+1)])
-        fLog.writeLog(f"Call downloadStockCurrent() status={status}")
+        #Way 1: single process
+        #status = downloadStockCurrent(stockCodeList[0+i*batchUnit:batchUnit*(i+1)])
+        #fLog.writeLog(f"Call downloadStockCurrent() status={status}")
+        #Way 2: multiprocessing
+        pool.apply_async(downloadStockCurrent, args=(stockCodeList[0+i*batchUnit:batchUnit*(i+1)], ), callback=stockCallback)
+    
+    pool.close()
+    pool.join()
+    endTime = datetime.datetime.now()
+    fLog.writeLog(f"Update {batchUnit} batch unit * {batchs} batchs = {rowcount} stocks current value total spent time {(endTime-startTime).seconds}s")
 
 
 #Capture fund current data and update into DB
 def downloadFundCurrent(fundCode):
     #fundCode = "161725" #Sample
+    fLog.writeLog(f"Call downloadStockCurrent() start for fund={fundCode}...")
     url = f"http://fundgz.1234567.com.cn/js/{fundCode}.js"
     
     try:
@@ -72,15 +113,26 @@ def downloadFundCurrent(fundCode):
             SET net_date='{fund['jzrq']}', unit_net={fund['dwjz']},esti_net={fund['gsz']},esti_rate={fund['gszzl']},gztime='{fund['gztime']}'
             WHERE fund_code='{fund['fundcode']}'
             """
-        rowcount = cs1.execute(sqlUpdatePrice)
-        conn.commit()
+        connx = dbPool.connection()
+        csx=connx.cursor()
+        rowcount = csx.execute(sqlUpdatePrice)
+        connx.commit()
+        
+        csx.close()
+        connx.close()
+        fLog.writeLog(f"Call downloadStockCurrent() finished for fund={fundCode}.")
     except Exception as e:
-        fLog.writeLog(e)
+        fLog.writeLog(f"Call downloadStockCurrent() exception for fund={fundCode}, exception={e}.")
+        #fLog.writeLog(e)
         return -1
     
     return 0
-
+    
+def fundCallback(status):
+    fLog.writeLog(f"Call downloadFundCurrent() finished status={status}")
+    
 def fundCurrentMain():
+    startTime = datetime.datetime.now()
     sqlFundCodeList = """
         SELECT fund_code 
         FROM sec_fund
@@ -92,16 +144,27 @@ def fundCurrentMain():
         	FROM sec_fund a, (SELECT @rownum:=0) b
         	WHERE fh_mark IS NOT NULL AND fund_type NOT IN ('ETF-场内', '债券型') 
         	ORDER BY fund_scale DESC
-        ) t WHERE rownum<=10
+        ) t WHERE rownum<=1000
         """
     rowcount = cs1.execute(sqlFundCodeList)
     records = cs1.fetchall()
     fundCodeList = []
     for r in records:
         fundCodeList.append(r[0])
+    
+    pool = multiprocessing.Pool(processes=5)
     for fundCode in fundCodeList:
-        status = downloadFundCurrent(fundCode)
-        fLog.writeLog(f"Call downloadStockCurrent() status={status}")
+        #Way 1: single process
+        #status = downloadFundCurrent(fundCode)
+        #Way 2: multiprocessing
+        status = pool.apply_async(downloadFundCurrent, args=(fundCode, ), callback=fundCallback)
+        fLog.writeLog(f"Call downloadStockCurrent() for fund={fundCode} status={status}")
+    pool.close()
+    pool.join()
+    fLog.writeLog(f"All processes for updating fund current value are completed, multiprocessing pool closed.")
+    
+    endTime = datetime.datetime.now()
+    fLog.writeLog(f"Update {rowcount} funds current value total spent time {(endTime-startTime).seconds}s")
 
 if __name__ == "__main__":
     stockCurrentMain()
@@ -109,4 +172,5 @@ if __name__ == "__main__":
     
     cs1.close()
     conn.close()
+    dbPool.close()
     fLog.close()

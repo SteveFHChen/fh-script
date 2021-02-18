@@ -11,7 +11,7 @@ def captureCNStocks():
     driver.set_page_load_timeout(40)
 
     try:
-        driver.get("http://www.yz21.org/stock/info/") # get接受url可以是如何网址，此处以百度为例
+        driver.get("http://www.yz21.org/stock/info/") 
     except:
         fLog.writeLog(f'Loading page timeout.')
 
