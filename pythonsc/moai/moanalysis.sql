@@ -23,16 +23,6 @@ SELECT CONCAT('{''key'': ''', k.pname, ''', ''total'': ', cnt, '},') json, cnt
 FROM fhmotitle_key k
 ORDER BY cnt DESC;
 
-SELECT #m.*, 
-	CONCAT('{''title'':''', title, ''', ''status'':''INIT'', ''keyname'':''', m.pname, '''},') json#, status, capture_date
-FROM fhmotitle_result m;
-ORDER BY capture_date DESC;
-
-SELECT #m.*, 
-	CONCAT('{''title'':''', title, ''', ''status'':''', STATUS,''', ''keyname'':''', keyname, '''},') json#, status, capture_date
-FROM fhmoinfo m
-ORDER BY capture_date DESC;
-
 SELECT CONCAT('{''key'': ''', k.keyname, ''', ''total'': ', total, '},') json#, total
 #SELECT * 
 FROM fhmokey k
@@ -43,4 +33,12 @@ LEFT JOIN (
 	ORDER BY 2 DESC
 ) m ON k.keyname = m.keyname
 ORDER BY create_date DESC;
+
+
+SELECT #m.*, 
+	CONCAT('{''title'':''', title, ''', ''status'':''', STATUS,''', ''keyname'':''', keyname, '''},') json#, status, capture_date
+FROM fhmoinfo m
+ORDER BY capture_date DESC;
+
+
 

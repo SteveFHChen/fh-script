@@ -18,6 +18,7 @@ CREATE TABLE fhmotitle(
 	person VARCHAR(50)
 );
 
+#根据所有mo title生成key，并将title和key mapping存入result
 #DROP TABLE fhmotitle_result IF EXISTS;
 CREATE TABLE fhmotitle_result AS
 SELECT title, pname
@@ -33,6 +34,15 @@ FROM (
 		FROM fhmotitle t
 	) a
 ) b WHERE LENGTH(pname)<=20;
+
+#再根据key反查没有归类的mo，将查到的结果补充给result
+Python script
+
+#最后从result中生成JSON
+SELECT #m.*, 
+	CONCAT('{''title'':''', title, ''', ''status'':''INIT'', ''keyname'':''', m.pname, '''},') json#, status, capture_date
+FROM fhmotitle_result m 
+ORDER BY capture_date DESC;
 
 CREATE TABLE fhmotitle_key AS 
 SELECT pname, COUNT(1) cnt
