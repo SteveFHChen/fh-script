@@ -15,6 +15,9 @@ def downloadStockCurrent(stockCodeList):
     #url = f"http://api.money.126.net/data/feed/0600519,0601318,1000333,0600036,money.api"
     url = f"http://api.money.126.net/data/feed/{stockCodeListStr},money.api"
     
+    connx = None
+    csx = None
+    
     try:
         res = requests.get(url, headers=headers)
         content = res.text
@@ -42,6 +45,10 @@ def downloadStockCurrent(stockCodeList):
                 fLog.writeLog(f"No data - {stock}")
         conn.commit()
     except Exception as e:
+        if(csx!=None):
+            csx.close()
+        if(connx!=None):
+            connx.close()
         fLog.writeLog(f"Call downloadStockCurrent() exception for stock={stockCodeListStr}, exception={e}")
         return -1
     
@@ -73,6 +80,21 @@ def stockCurrentMain():
         """
         # 股票代码前加前缀：上证加0, 深证加1，中证暂未知
         #AND price_time IS NULL
+        
+    #只快速更新前两天在大涨的股票，用于快速跟踪大涨股
+    sqlStockCodeListx = """
+        SELECT CONCAT(sh_sz_indicator, stock_code) stock_code 
+        FROM sec_stock t 
+        WHERE region_code='CN' AND section_name<>'中证' 
+		AND EXISTS(
+			SELECT 1 
+			FROM sec_stock_continuity c 
+			WHERE end_date>=DATE_SUB(CURDATE(), INTERVAL 4 DAY) 
+				AND c.up9_days >=2
+				AND c.stock_code = CONCAT(t.sh_sz_indicator, t.stock_code)
+		)
+        ORDER BY fund_welcome_cnt DESC
+        """
     
     rowcount = cs1.execute(sqlStockCodeList)
     records = cs1.fetchall()
@@ -100,7 +122,7 @@ def stockCurrentMain():
 #Capture fund current data and update into DB
 def downloadFundCurrent(fundCode):
     #fundCode = "161725" #Sample
-    fLog.writeLog(f"Call downloadStockCurrent() start for fund={fundCode}...")
+    fLog.writeLog(f"Call downloadFundCurrent() start for fund={fundCode}...")
     url = f"http://fundgz.1234567.com.cn/js/{fundCode}.js"
     
     try:
@@ -168,7 +190,7 @@ def fundCurrentMain():
 
 if __name__ == "__main__":
     stockCurrentMain()
-    fundCurrentMain()
+    #fundCurrentMain()
     
     cs1.close()
     conn.close()

@@ -11,6 +11,8 @@ fLog = LogWriter(logFile)
 driver = webdriver.Chrome(executable_path=chromeDriverExe, chrome_options=chrome_options)
 driver.set_page_load_timeout(40)
 
+batchSize = 100
+
 def captureFenghuangSecSectionCategory(dataFile, forceRecover=False):
     if forceRecover==False:
         if os.path.exists(dataFile)==True:
@@ -119,6 +121,8 @@ def updateFenghuangSecSectionCategory(dataFile):
             fLog.writeLog(f"|----{secSubType['secSubType']}[{len(secSubType['object'])}]")
             
             successIndicate = 0
+            '''
+            #Low performance
             for obj in secSubType['object']:
                 #obj = secSubType['object'][0]
                 sqlIndicate = f"""
@@ -126,6 +130,25 @@ def updateFenghuangSecSectionCategory(dataFile):
                     SET section_name='{secType["secType"]}', subsection_name='{secSubType["secSubType"]}' 
                     WHERE stock_code='{obj["code"]}'
                     """
+            '''
+            #Use batch update DB data to improve performance.
+            sqlIndicate = Nonel
+            for batchi in range(math.ceil(len(secSubType['object'])/batchSize)):
+                objects = secSubType['object'][batchi*batchSize: (batchi+1)*batchSize]
+                objectsStr = "'"+"','".join([obj['code'] for obj in objects])+"'"
+                if secType['secType'] =='A股' and secSubType["secSubType"]=='指数':
+                    sqlIndicate = f"""
+                        UPDATE sec_stock 
+                        SET section_name='{secType["secType"]}', subsection_name='{secSubType["secSubType"]}' 
+                        WHERE region_code='CN' AND (stock_type='指数' OR section_name IS NULL) AND stock_code IN ({objectsStr})
+                        """
+                else:
+                    sqlIndicate = f"""
+                        UPDATE sec_stock 
+                        SET section_name='{secType["secType"]}', subsection_name='{secSubType["secSubType"]}' 
+                        WHERE (stock_type!='指数' OR section_name IS NULL) and stock_code in ({objectsStr})
+                        """
+                print(sqlIndicate)
                 rowcount = cs1.execute(sqlIndicate)
                 successIndicate = successIndicate + rowcount
             conn.commit()
@@ -146,7 +169,7 @@ def captureSohuSecSectionCategory(dataFile, forceRecover=False):
     except:
         fLog.writeLog(f'Loading page timeout, company is {company}.')
         
-    stockSectionCategoryList={"shared": NULL, "industry": NULL, "region": NULL, "concept": NULL}
+    stockSectionCategoryList={"industry": NULL, "region": NULL, "concept": NULL} #"shared": NULL, 
     sectionListLi=driver.find_elements(By.CSS_SELECTOR,"ul#BIZ_MS_phTab li")
     for sectionLi in sectionListLi:
         sectionLi.click()
@@ -165,7 +188,8 @@ def captureSohuSecSectionCategory(dataFile, forceRecover=False):
             """
         stockCategoryList=json.loads(driver.execute_script(jsStockCategoryList))
         if sectionLi.text=="板块综合":
-            stockSectionCategoryList['shared'] = stockCategoryList
+            #stockSectionCategoryList['shared'] = stockCategoryList#Steve comment on 2021-04-03
+            fLog.writeLog(f'No need to capture shared data.')
         elif sectionLi.text=="行业分类":
             stockSectionCategoryList['industry'] = stockCategoryList
         elif sectionLi.text=="地域板块":
@@ -231,11 +255,11 @@ def updateSohuSecSectionCategory(dataFile):
 
 if __name__ == "__main__":
     dataFile = f"{savePath}secTypeList{currentDate}.js"
-    captureFenghuangSecSectionCategory(dataFile)
-    #updateFenghuangSecSectionCategory(dataFile)
+    #captureFenghuangSecSectionCategory(dataFile)
+    updateFenghuangSecSectionCategory(dataFile)
     
     dataFile = f"{savePath}stockSectionCategoryList{currentDate}.js"
-    captureSohuSecSectionCategory(dataFile)
+    #captureSohuSecSectionCategory(dataFile)
     #updateSohuSecSectionCategory(dataFile)
     
     cs1.close()

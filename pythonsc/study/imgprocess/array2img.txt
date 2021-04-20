@@ -74,6 +74,42 @@ plt.show()
 array的复制：
 im22=im2.copy()
 
+
+import skimage.io as io
+
+#本实验用于理解RGB图像的三维数据存储结构，以及三维数组的点乘运算，和黑白灰度图像的二维数据存储结构
+#RGB图像的数据存储结构为（高，宽，颜色通道数），即数据的行为宽，列为通道数，深为高。
+#数组中每一个最小单位元素为一个像素点的RGB值，即[R, G, B]
+im_sk=io.imread('studyImagew10xh5_r200_g100_b50.jpg')
+
+#修改边角像素颜色测试对图像三维数组存储结构的理解
+im_sk[0, 0]=[255, 0, 0] #从左上角数，将图像第0行第0列变为纯红色
+im_sk[0, -1]=[0, 255, 0] #从左上角数，将图像第0行最后1列变为纯绿色
+im_sk[-1, 0]=[0, 0, 255] #从左上角数，将图像最后1行第0列变为纯蓝色
+
+#通道的提取与RGB转灰度图
+kred = np.array([1, 0, 0])#提取红色通道
+kgray = np.array([0.299, 0.587, 0.114])#转为黑白灰度图
+
+#降通道数的通道颜色提取
+im_skred = im_sk @ kred
+im_skgray = im_sk @ kgray
+#注意：三维数组与一维数组做@运算是怎么算的：
+#每个最小元素与一维数组进行对应位置数值相乘再相加，乘完后就点有图像宽和高，没有了通道数，即变成了二维数组，降了一维。
+plt.imshow(im_skred, plt.cm.gray)
+plt.imshow(im_skgray, plt.cm.gray)
+
+#保留通道数的颜色提取
+#注意：三维数组与一维数组做*运算是怎么算的：
+#每个最小元素与一维数组进行对应位置数值仅相乘，不再相加乘积，应此通道数不变
+im_skred = im_sk * kred
+plt.imshow(im_skred)
+
+plt.imshow(im_sk)
+
+
+
+
 #RGB转灰度图的实现：
 #RGB值和灰度的转换，3种色的权重不是相等的，
 #实际上是人眼对于彩色的感觉到亮度感觉的转换，这是一个心理学问题，有一个公式：Grey = 0.299*R + 0.587*G + 0.114*B
@@ -81,7 +117,6 @@ im22=im2.copy()
 #from skimage import color
 #im_sk_gray=color.rgb2gray(im_sk)
 
-import skimage.io as io
 im_sk=io.imread('dog.jpg')
 im_sk=io.imread('jiedao.jpg')
 im_sk=io.imread('house1.jpg')

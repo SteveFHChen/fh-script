@@ -3,7 +3,7 @@ from sklearn import datasets
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import train_test_split
 from collections import Counter
-from sklearn.metrics import accuracy_score
+import sklearn.metrics as ms
 import matplotlib.pyplot as plt
 
 from matplotlib.font_manager import FontProperties

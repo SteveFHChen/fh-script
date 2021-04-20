@@ -39,6 +39,15 @@ ALTER TABLE sec_stock ADD PRIMARY KEY(stock_type, stock_code);
 /* 0-上证, 1-深证. To improve system performance, and simplify SQL */
 ALTER TABLE sec_stock ADD COLUMN sh_sz_indicator VARCHAR(1);
 
+/* 概念板块 - 在行业基础上再细分，以便将性质相同的放在一起分析，剔除性质不同的  */
+ALTER TABLE sec_stock ADD concept_bk VARCHAR(20) AFTER industry; 
+
+/* 基金映射列 - 以方便直接和天天基金网取下的基金重仓前10股票数据表关联 */ 
+ALTER TABLE sec_stock ADD COLUMN fund_map_code VARCHAR(20) AFTER sh_sz_indicator;
+
+/* 股票上市日期 */
+ALTER TABLE sec_stock ADD go_market_date DATE;
+
 /* DROP TABLE sec_stock_type_v; */
 CREATE TABLE sec_stock_section_pivot(
 	create_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -71,7 +80,60 @@ CREATE TABLE sec_stock_history(
 	total_market_value BIGINT, /*市总值*/
 	circu_market_value BIGINT, /*流通市值*/
 	trading_lots INT, /*成交笔数*/
-	PRIMARY KEY(stock_code, price_date)
+	PRIMARY KEY(price_date, stock_code)
 );
 ALTER TABLE sec_stock_history MODIFY COLUMN trading_volume BIGINT;
+
+ALTER TABLE sec_stock_history DROP PRIMARY KEY;
+ALTER TABLE sec_stock_history ADD PRIMARY KEY(price_date, stock_code);
+
+#股票连续性分析
+#drop table if exists sec_stock_continuity;
+CREATE TABLE sec_stock_continuity(
+	analyze_type VARCHAR(10),/*大涨、大跌、悄涨、悄跌*/
+	stock_code VARCHAR(20),
+	stock_name VARCHAR(50),
+	
+	trade_days INT,
+	up9_days INT,
+	
+	sum_percent FLOAT,
+	avg_percent FLOAT,
+	real_percent FLOAT, /* (close_price - open_price) / open_price*/
+	
+	close_price FLOAT,
+	high_price FLOAT,
+	low_price FLOAT,
+	open_price FLOAT,
+	
+	start_date DATE,
+	end_date DATE
+);
+
+ALTER TABLE sec_stock_continuity ADD af_up9_percent FLOAT AFTER up9_days;
+ALTER TABLE sec_stock_continuity ADD bf_up9_days INT AFTER trade_days;
+ALTER TABLE sec_stock_continuity ADD st_up9_date DATE;
+
+
+DROP TABLE IF EXISTS sec_stock_tradeatbig;
+CREATE TABLE sec_stock_tradeatbig(
+	analyze_type varchar(20),/*跌停价买入涨停股, 涨停价买入涨停股, 涨停价买入一字涨停股*/
+	buy_date DATE,
+	stock_code VARCHAR(20),
+	stock_name VARCHAR(50),
+	dxm1_percent FLOAT,
+	dx_percent FLOAT,
+	buy_price FLOAT,
+	sell_price FLOAT,
+	earn_percent FLOAT,
+	sell_price2 FLOAT,
+	earn_percent2 FLOAT,
+	gain_indicator VARCHAR(1),
+	loss_indicator VARCHAR(1),
+	no_indicator VARCHAR(1),
+	PRIMARY KEY(analyze_type, buy_date, stock_code)
+);
+ALTER TABLE sec_stock_tradeatbig ADD flag VARCHAR(10);/*正确、错误、科创板、创业板*/
+
+
 

@@ -31,6 +31,7 @@ import requests
 import re
 import json
 import csv
+import io
 
 mainScript = sys.argv[0]
 endSlashIndex = mainScript.rfind("/", 0, mainScript.rfind("/")-1)
@@ -38,7 +39,8 @@ mainPath = mainScript[:endSlashIndex+1]
 writeLog(f"mainScript: [{mainScript}]")
 writeLog(f"mainPath: [{mainPath}]")
 
-sys.path.append(mainPath+'../utils')
+#sys.path.append(mainPath+'../utils')
+sys.path.append('C:/fh/ws/ws1/fh-script/pythonsc/utils')
 import logger as lg
 from LogWriter import *
 from properties import *
@@ -58,3 +60,5 @@ headers = {'content-type': 'application/json',
 chromeDriverExe="C:/fh/testenv1/chromedriver.exe"
 
 writeLog("Import fhsechead completed.")
+
+g_interval_days = 50

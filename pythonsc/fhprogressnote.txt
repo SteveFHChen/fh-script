@@ -1,0 +1,321 @@
+
+
+2021-03-08学习内容
+1. 整理PIL/RGB、CV2/numpy/BGR、Pytorch tensor的数据格式，以及相互之间的转换 （ 2020-03-08完成）
+	Ref: https://blog.csdn.net/qq_36955294/article/details/82888443
+2. 学习Python基础（一一写代码通过做实验理解）
+	Python变量对象的赋值/深浅拷贝，和作用域
+	高阶函数map()、reduce()、filter()、sorted()的使用
+3. 学习PyTorch基础——Tensor
+	Tensor的数据类型
+	创建和维度查看：t.shape, t.size()
+	组合与分块：torch.cat(t1, t2), torch.stack(), torch.chunk(), troch.split()
+	索引与变形：
+		t.view(), t.resize(), t.reshape(), t.resize_()
+		transpose(), permute()
+		squeeze(), unsqueeze()
+		expand(), epand_as()
+	自动广播与向量化
+	内存共享
+4. 分类识别网络——VGGNet, ResNet
+2-4 ref: 《深度学习之PyTorch物理检测实战》
+
+2021-03-10学习内容
+1.Labelme
+	安装，标注图片得到Json/XML文件（ 2020-03-10完成）
+	用了Labelme就查以省去自己真正截图准备224x224大小的图片了，也方便给图像打多种标签。
+	后期使用时只需要通过缩放就可得到需要尺寸的图片。
+	Ref: 数据标注软件labelme详解 https://blog.csdn.net/u014061630/article/details/88756644
+	
+	Python根据json文件显示图片的标注区域（ 2020-03-11完成）
+	
+2021-03-12
+1. 1/2/3-D数组几何变换（ 2020-03-12完成）
+	取通道，转灰度图
+	顺逆时针旋转90/180/270度
+	湖面倒映镜像，梳头镜像
+2. 1/2/3-D卷积运算（ 2020-03-12完成）
+	使用numpy库函数
+	自实现高性能滑动窗口卷积运算
+	
+2021-03-16
+1. 图像透视变换
+	数学原理、公式推导与转Python实现
+	手工选矫正点
+	自动选矫正点（opencv cv2.findContours()）
+	应用：车牌识别、水表读数识别、一维码/二维码识别、图形校验码识别
+2. 图像滤波
+	边缘检测：Roberts, Sobel, Laplace, Log/Dog, Canny
+	图像模糊：高斯函数、正态分布
+	图像锐化：
+	
+2021-03-17
+1. SKLearn cluster聚类
+	聚类算法的类型、库的使用
+	应用于图像分割
+2. 车牌识别
+3. 视频截图目标提取
+
+2021-03-20
+1. 证件拍照识别
+	身份证
+	驾驶证
+2. 道路路牌识别
+	高速公路
+	普通道路
+3. 温度热图检测
+	公共场所体温实时检测
+4. Pascal VOC dataset download(完成，下载了2007和2012的数据集)
+		用迅雷下载非常快
+		https://pjreddie.com/projects/pascal-voc-dataset-mirror/
+5. Yolo3物体检测
+	从图片、电影视频、电脑摄像头检测目标（完成）
+
+	相关技术
+		pt文件的产生与使用
+			Pytorch如何保存训练好的模型
+			https://blog.csdn.net/comli_cn/article/details/107516740
+		weights、h5文件的产生与使用
+			【YOLO】如何将Keras训练的模型用于OpenCV中（.h5文件转换成.weights文件）
+			https://www.pianshen.com/article/59191134949/
+			keras保存模型中的save()和save_weights()
+			https://blog.csdn.net/leviopku/article/details/86612293
+		__dict__、__name__、__main__等属性的含义与使用
+			from __future__ import division
+			http://c.biancheng.net/view/2374.html
+			https://blog.csdn.net/xun527/article/details/79263512
+		Python调用windows下的dll文件
+			https://www.codepku.com/information/594
+	ayooshkathuria作者
+		源码：https://github.com/ayooshkathuria/pytorch-yolo-v3
+			使用训练好的yolov3.weights，无法训练权重文件
+		pytorch物体检测（视频检测）https://blog.csdn.net/weixin_43570254/article/details/104210782
+			从图片、电影视频、电脑摄像头检测目标
+		下载已练好的权重文件：https://pjreddie.com/media/files/yolov3.weights 
+	Bubbliing作者
+		源码：https://github.com/bubbliiiing/yolo3-pytorch
+			纯Python + PyTorch实现
+		Blog：https://blog.csdn.net/weixin_44791964/article/details/105310627
+		B站视频：https://www.bilibili.com/video/BV1Hp4y1y788?p=3
+		常见问题汇总: https://blog.csdn.net/weixin_44791964/article/details/107517428
+	ultralytics作者
+		源码：https://github.com/ultralytics/yolov3
+			Fh:训练报错失败
+		官方训练指导文档: https://github.com/ultralytics/yolov3/wiki/Train-Custom-Data
+			下载COCO128数据集
+			https://github.com/ultralytics/yolov5/releases/download/v1.0/coco128.zip
+		PyTorch YOLOv3-train.py
+		https://blog.csdn.net/qq_34131692/article/details/110250623
+		YOLOV3训练自己的数据集（PyTorch版本）
+		https://www.pianshen.com/article/1287380494/
+	pjreddie作者
+		源码：https://github.com/pjreddie/darknet
+			C语言实现Darknet，使用weights文件
+		Yolo-Darknet官网：https://pjreddie.com/darknet/yolo/
+			Detection Using A Pre-Trained Model
+			Changing The Detection Threshold
+			Tiny YOLOv3
+				https://pjreddie.com/media/files/yolov3-tiny.weights
+			Real-Time Detection on a Webcam
+			Training YOLO on VOC
+				https://pjreddie.com/media/files/darknet53.conv.74
+			Training YOLO on COCO
+			YOLOv3 on the Open Images dataset
+	如何基于已有的Yolo权重模型训练自己的数据集，进行迁移学习？
+	
+6. SSD目标检测
+	Pytorch 搭建自己的SSD目标检测平台（Bubbliiiing 深度学习 教程）
+	https://www.bilibili.com/video/BV1A7411976Z?from=search&seid=13650119858689265979
+	源码：https://github.com/bubbliiiing/yolo3-pytorch
+		纯Python + PyTorch实现
+
+2021-03-21
+1. 安装LabelImg（完成）
+
+2021-03-26
+1. Python提取视频中的声音
+2. 画音频波形图
+3. Python播放视频（带声音）
+4. Python播放音频
+5. 声音、语音识别
+	应用
+		语音识别数字0-9
+		根据声音识别视频中激烈片段
+	传统音频处理与识别技术、框架
+	新型音频处理与识别技术、框架
+		神经网络
+			卷积神经网络
+			
+			语音识别——基于深度学习的中文语音识别系统框架
+			https://blog.csdn.net/chinatelecom08/article/details/82557715
+	公开语音神经网络训练数据
+	音频视频处理框架、库
+		moviepy
+		wave
+		scipy.io wavfile
+			wavfile操作简单，但是只对.wav格式有效。pydub略微复杂，但是功能强大，支持多种文件格式，如，我们常见的mp3, wav,MP4等。
+			
+			wavfile, pydub - 怎样用Python剪辑视频？
+			https://www.zhihu.com/question/312758987/answer/649488281
+		sounddevice
+		pydub
+		playsound
+		pyaudio
+		
+		MoviePy - 中文文档(一个专业的python视频编辑库)教程
+		https://blog.csdn.net/ucsheep/article/details/80999939
+		
+		python读写音频文件小结
+		https://blog.csdn.net/lujian1989/article/details/110479941
+		
+		MoviePy源码
+		https://github.com/Zulko/moviepy
+		MoviePy官网
+		https://zulko.github.io/moviepy/
+		
+		Python库之pyaudio简介、安装、使用方法之详细攻略
+		https://blog.csdn.net/qq_41185868/article/details/80478081
+		
+		Wave, Scipy - 用 python 对音乐（音频）进行处理，画出相应的音谱图
+		https://leejason.blog.csdn.net/article/details/87942244
+		
+		SoundDevice - 利用PYTHON进行语音信号处理(一. 录制一段音频并且回放,绘制图像)
+		https://www.freesion.com/article/6239363875/#13__66
+		
+		Python玩转各种多媒体，视频、音频到图片
+		https://zhuanlan.zhihu.com/p/138984453
+	
+2021-03-28
+1.基于之前的实验，系统完整学习以下库
+	学完就有自信没有没见过的函数或用法，如果遇到新的即可提醒是自己没记得或是新的灵活用法。
+	numpy, pandas, opencv, sklearn, pytorch, scipy
+	对每一个模块、函数写代码进行试用，后期对实验代码进行复习，网上查找笔试面试题进行测试，平时多看框架的源码。
+	天下功夫唯快不攻，将官方文档来回撸几遍就熟了。
+	制定计划每次学一块，以避免一次性热度学的停不下来太辛苦。
+	numpy:
+		Day1:
+			Array objects
+		Day2:
+			Constants
+			Universal functions (ufunc)
+		Day3:
+			Routines
+		Day4:
+			Typing (numpy.typing)
+			Global State
+			Packaging (numpy.distutils)
+		Day5:
+			NumPy Distutils - Users Guide
+			NumPy C-API (Skip)
+		Day6:
+			NumPy internals
+			SIMD Optimizations
+			NumPy and SWIG
+	Pandas:
+		Day1:
+			Input/output
+			General functions
+		Day2:
+			Series
+			DataFrame
+			pandas arrays
+		Day3:
+			Index objects
+			Date offsets
+		Day4:
+			Window
+			GroupBy
+			Resampling
+			Style
+			Plotting
+			General utility functions
+			Extensions
+	
+2021-03-29
+1. SSD目标检测
+
+2021-04-01
+天下功夫唯快不攻，在对某门技术开始敏感 时，有了学习某门技术的意识时，快速学习掌握一个或多个框架，并在工作和业余项目中使用学到的技术。
+1. MicroService - Spring Cloud
+	SpringCloud微服务分布式架构项目开发实战-SpringCloud框架开发教程全套完整视频教程(Fh:动力节点 杨利军 背景和开发讲解逻辑清晰有条理)
+	https://www.bilibili.com/video/BV1Et411c7JD?p=18
+	
+2. Spring boot
+	SpringBoot实战教程-深入浅出springboot(Fh:动力节点)
+	https://www.bilibili.com/video/BV1U541157Wp
+	
+	全面升级版SpringBoot&SpringCloudAlibaba 阿里核心技术+项目实战教程-SpringCloudAlibaba超全面讲解【通俗易懂】
+		由浅入深，带你体验Spring Boot的极速开发过程，内容丰富涵盖了SpringBoot开发的方方面面，并且同步更新到Spring Boot 2.x系列的最新版本
+		并带你深入掌握基于Spring Cloud Alibaba技术栈的微服务开发技术，包括nacos、sentinel、seata、gateway、skywalking等，培养独立进行企业微服务项目架构的能力，让你一次性拿下Spring Boot&Spring Cloud Alibaba框架
+	(Fh:动力节点，达到培养专业开发人员的一门培训机构级课程)
+	https://www.bilibili.com/video/BV1vy4y167Dc
+	
+	B站最全Spring全家桶教程——深入源码底层（2020最新）(Fh:入门使用)
+	https://www.bilibili.com/video/BV1t4411o7rb
+	
+3. Spring Professional Certification
+
+4. Spring生态（全家桶）
+	学会使用，再看源码，调试且测试，做专业认证试题，总结积累重要题目。
+		Spring容器启动过程
+		Spring bean的生命周期，如何动态注册和注销Bean。
+		Spring boot启动过程
+	Spring Boot
+	Spring Framework
+	Spring Cloud
+	Spring Integration
+	Spring Batch
+	Spring Session
+	Spring Security
+	
+5. 什么更重要
+	会编程语言 < 会使用开发框架 <  会很多语言框架进行架构  
+	Java、Python    Spring
+	会数据运算与机械处理 < 会算法做数据分析挖掘
+	    DB、SQL                   神经网络
+
+2021-04-02
+1. 股票
+	股票表新建1列存储今年基金对股票的欢迎度，找到基金抱团股
+	获取股票各行业的历史数据
+	分析各行业分类中的白马龙头股 
+		-> 对各行业分类的所有股按三六九等划分，从而可分类讨论：是投资白马股，还是投资潜力股，还是赌便宜股
+		-> CN股票行业是空值的需要查明原因，并补回数据
+		-> 统计基金重仓股排名中各行业前10的股，以及哪些股有大涨大跌的情况
+	统计每天的热点在哪些行业分类上 
+		-> 根据历史数据分析各行业分类过去每天各涨跌幅度的股数，再依数据画图表观察出热点
+		-> 在概念板块中，一个股会打有多个概念标签，如何恰当的找出一天中概念板块的热点和冷点可成为一个研究课题
+	观注市盈率，按行业分类进行批判股票高估还是抵估
+		-> 在股票表中增加市盈率
+		-> 爬取股票对应公司的财务报表和财务指标数据
+			-> 使用Pandas对爬取到的公司财务报表表格进行数据处理再入库
+	股票分类
+		行业龙头股、白马股、潜力股
+		周期股、非周期股
+			周期股：航空、银行、有色金属、
+			非周期股：白酒、医疗、医药
+	影响股价的因素
+		企业营业状况
+			企业重在事件
+			发布财务报表
+		股市
+		全球大环境
+		国家政策、划规、重点变化
+	价值投资者、技术投资者
+		选择护城河宽的企 -> 哪些是护城河宽的企业
+2. 基金
+	3月初医疗出现一个绝佳的入口点
+	下跌20%即可投入
+3. 数据分析方法
+	时间序列预测
+	分类
+	聚类
+
+2021-04-05
+股票基金数据下载新方法
+	开源金融数据比较：Tushare、Akshare、baostock、理杏仁等
+	https://zhuanlan.zhihu.com/p/219633414
+
+
+
+	

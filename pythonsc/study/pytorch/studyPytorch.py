@@ -97,6 +97,76 @@ print(s_max_out)
 print(s_max_out.shape)
 print("1D sequential convolution and pooling  end====================")
 
+
+#二维卷积运算原理
+#参考：【PyTorch入门】之五分钟学会二维卷积层的运算、实现及应用
+#       https://blog.csdn.net/weixin_44610644/article/details/105063307
+def cross(X,K):
+    H_i = X.shape[0]
+    W_i = X.shape[1]
+    h = K.shape[0]
+    w = K.shape[1]
+    Y = torch.zeros((H_i-h+1,W_i-w+1))
+    for i in range(Y.shape[0]):
+        for j in range(Y.shape[1]):
+            Y[i,j] = (X[i:i+h,j:j+w]*K).sum()
+    return Y
+
+#下面使用二维卷积层检测图像中物体的边缘（像素发生变化的位置）。
+#首先初始化一张6 × 8 6\times 86×8的图像，令它的中间四列为黑(0)，其余为白(1)。
+x1 = torch.ones(6,8)
+x1[:,2:6] = 0
+
+#然后构造一个大小为1 × 2 1\times 21×2的卷积核K，当它与输入做互相关运算时，如果横向相邻元素相同，输出为0；否则输出为非0。
+k1 = torch.tensor([[1, -1]])
+
+#最后使用互相关运算，计算得到输出值。
+y1 = cross(x1, k1)
+#可以看出， 我们将从白到黑的边缘和从黑到白的边缘分别检测成了1和-1。其余部分的输出全是0。 使用卷积核可以有效地表征局部空间。
+
+
+
+#学习PyTorch二维卷积
+print("2D convolution...")
+k2=torch.from_numpy(np.arange(6).reshape(-1, 1,2,3)).float() #2行x3列x1深，-1是因为要包多一维形成四维数据
+#一维卷积要输入三维数据，二维卷积要输入四维数据，否则报以下错误。
+#RuntimeError: Expected 4-dimensional input for 4-dimensional weight [1, 1, 2, 2], but got 3-dimensional input of size [1, 2, 3] instead
+
+m2 = nn.Conv2d(1, 1, 2, stride=1, padding=1) #接收1层二维数组数据，输出一层二维数组数据，核大小为2x2，步进为1，边沿各补1个
+print(m)
+print(m.weight) #查看卷积核
+print(m.bias) #查看偏置系数
+
+#input = torch.randn(5, 2, 3)
+input = torch.arange(6).reshape(-1, 1,2,3) #5*2*3 #生成5通道1行10列的三维数据，即5个批次，每批为1行x10列
+input = input.float() #To fix issue: Expected object of scalar type Long but got scalar type Float
+print(input)
+print(input.shape)
+
+output2 = m2(k2)
+output2 = m2(input) # out = sum(in * weight) + bias
+print("Covolution result...")
+print(output2)
+print(output2.shape)
+print("2D convolution end====================")
+
+print("2D max pooling...")
+p_max = nn.MaxPool1d(2)
+print(p_max)
+p_max_out = p_max(input) #Sampling: 5x1x10 will become 5x1x5, out = max(in each 2)
+print(p_max_out)
+
+print("2D avg pooling...")
+p_avg = nn.AvgPool1d(2)
+print(p_avg)
+p_avg_out = p_avg(input)
+print(p_avg_out)
+print("2D pooling end====================")
+
+
+
+
+
 print("View...")
 print(input)
 print(input.size())

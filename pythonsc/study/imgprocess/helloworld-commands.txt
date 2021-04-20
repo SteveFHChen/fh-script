@@ -105,6 +105,84 @@ im_cv2 = cv2.cvtColor(im_cv, cv2.COLOR_BGR2RGB)
 plt.imshow(im_cv2)
 plt.show()
 
+#也可使用opencv自带图像显示函数
+cv2.imshow('window title', image1)
+cv2.imshow('window title', image2)
+cv2.waitKey(0) #显示后delay多久，0表示永久
+
+
+
+#Python图像数据格式与转换总结
+Ref: Pytorch中Tensor与各种图像格式的相互转化 https://blog.csdn.net/qq_36955294/article/details/82888443
+一般在pytorch或者python中处理的图像无非这几种格式：
+
+	PIL/RGB：使用python自带图像处理库PIL读取出来的图片格式
+	openCV/numpy/BGR：使用python-opencv库读取出来的图片格式
+	tensor：pytorch中训练时所采取的向量格式（当然也可以说图片）
+	注意，之后的讲解图片格式皆为RGB三通道，24-bit真彩色，也就是我们平常使用的图片形式。
+
+	PIL和Numpy格式是可以直接使用plt显示图像，Tensor格式不能直接显示，需要转成前2种才能显示。
+	
+import skimage.io as io
+from PIL import Image
+import cv2
+import torch
+
+im_sk=io.imread('dog.jpg')
+im_pil=Image.open('dog.jpg')
+im_cv=cv2.imread('dog.jpg')
+
+type(im_sk), im_sk.size, im_sk.shape
+#(<class 'numpy.ndarray'>, 3101289, (829, 1247, 3))
+
+type(im_pil), im_pil.size#, im_pil.shape
+#(<class 'PIL.JpegImagePlugin.JpegImageFile'>, (1247, 829))
+
+type(im_cv), im_cv.size, im_cv.shape
+#(<class 'numpy.ndarray'>, 3101289, (829, 1247, 3))
+
+im_pil_rgb=im_pil.convert('RGB')
+type(im_pil_rgb), im_pil_rgb.size#, im_pil_rgb.shape
+#(<class 'PIL.Image.Image'>, (1247, 829))
+
+from torchvision import transforms
+
+loader = transforms.Compose([transforms.ToTensor()])  
+unloader = transforms.ToPILImage()
+
+#PIL读取图片转化为Tensor
+im_pil2tensor = loader(im_pil_rgb)
+
+type(im_pil2tensor), im_pil2tensor.size, im_pil2tensor.shape
+#(<class 'torch.Tensor'>, <built-in method size of Tensor object at 0x000002859D1C8A40>, torch.Size([3, 829, 1247]))
+
+#Tensor转化为PIL图片
+unloader(im_pil2tensor).shape
+
+#直接展示tensor格式图片
+#方式1：转成PIL(RGB)再显示
+plt.imshow(unloader(im_pil2tensor))
+#方式2：转成CV2(BGR)再显示
+#plt.imshow(cv2.cvtColor(im_pil2tensor.cpu().numpy().squeeze().transpose((1,2,0)), cv2.COLOR_BGR2RGB)) #颜色不对
+
+#直接保存tensor格式图片
+#im_tensor.save('dog_tensor.jpg') #没成功
+
+#Numpy转化为Tensor
+im_cv2tensor = torch.from_numpy(im_cv.transpose((2, 0, 1)))
+
+type(im_cv2tensor), im_cv2tensor.size, im_cv2tensor.shape
+#(<class 'torch.Tensor'>, <built-in method size of Tensor object at 0x0000028585AEF680>, torch.Size([3, 829, 1247]))
+
+#Tensor转化为Numpy
+im_cv2tensor2numpy = im_cv2tensor.cpu().numpy().squeeze().transpose((1, 2, 0))
+plt.imshow(cv2.cvtColor(im_cv2tensor2numpy, cv2.COLOR_BGR2RGB))
+
+type(im_cv2tensor2numpy), im_cv2tensor2numpy.size, im_cv2tensor2numpy.shape
+#(<class 'numpy.ndarray'>, 3101289, (829, 1247, 3))
+
+
+
 
 #图片处理============>
 

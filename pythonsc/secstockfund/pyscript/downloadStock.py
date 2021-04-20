@@ -64,8 +64,11 @@ def captureCNStocks():
                 else:
                     rowcount = cs1.execute(sqlAdd)
             except Exception as e:
-                fLog.writeLog(f"Failed add: {s}")
-                fLog.writeLog(f"Exception msg: {e}")
+                try:
+                    fLog.writeLog(f"Failed add: {s}")
+                    fLog.writeLog(f"Exception msg: {e}")
+                except Exception as e:
+                    fLog.writeLog(f"Exception in exception - Failed add: {s['code']}")
         conn.commit()
         fLog.writeLog(f"Completed capture page [{i}].")
 

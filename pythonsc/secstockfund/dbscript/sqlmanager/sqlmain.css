@@ -1,0 +1,20 @@
+.cSQL {
+    display: inline-block;
+    margin-right: 20px;
+    width: 500px;
+    margin-bottom: 5px;
+    vertical-align: top;
+}
+
+.cHeader {
+    font-weight: bold;
+    padding: 10px;
+}
+
+textarea {
+    width: 1000px;
+    overflow: scroll;
+	height: 500px;
+	display: none;
+}
+

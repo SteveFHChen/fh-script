@@ -1,0 +1,60 @@
+/* downloadSecSectionCategory.py 采集到的数据格式样板 */
+/* 源于 http://app.finance.ifeng.com/hq/list.php?type=stock_a&class=zs */
+[
+	{"secType": "A股", "secTypeHref": "http://app.finance.ifeng.com/hq/list.php?type=stock_a", "secSubType": [
+		{"secType": "A股", "secSubType": "指数", "secSubTypeHref": "http://app.finance.ifeng.com/hq/list.php?type=stock_a&class=zs", "object": [{"code": "399997", "name": "中证白酒"}, {"code": "399998", "name": "中证煤炭"}]}, 
+		{"secType": "A股", "secSubType": "沪A", "secSubTypeHref": "http://app.finance.ifeng.com/hq/list.php?type=stock_a&class=ha", "object": [{"code": "605399", "name": "晨光新材"}, {"code": "605500", "name": "森林包装"}]}, 
+		{"secType": "A股", "secSubType": "深A", "secSubTypeHref": "http://app.finance.ifeng.com/hq/list.php?type=stock_a&class=sa", "object": [{"code": "000001", "name": "平安银行"}, {"code": "000002", "name": "万 科Ａ"},{"code": "003040", "name": "楚天龙"}]}, 
+		{"secType": "A股", "secSubType": "创业板", "secSubTypeHref": "http://app.finance.ifeng.com/hq/list.php?type=stock_a&class=gem", "object": [{"code": "300001", "name": "特锐德"}, {"code": "300002", "name": "神州泰岳"}, {"code": "300003", "name": "乐普医疗"}, {"code": "300004", "name": "南风股份"}, {"code": "300005", "name": "探路者"}]}
+	]},
+	
+	{"secType": "B股", "secTypeHref": "http://app.finance.ifeng.com/hq/list.php?type=stock_b", "secSubType": [
+		{"secType": "B股", "secSubType": "沪B", "secSubTypeHref": "http://app.finance.ifeng.com/hq/list.php?type=stock_b&class=hb", "object": [{"code": "900901", "name": "云赛Ｂ股"}, {"code": "900902", "name": "市北B股"}]}, 
+		{"secType": "B股", "secSubType": "深B", "secSubTypeHref": "http://app.finance.ifeng.com/hq/list.php?type=stock_b&class=sb", "object": [{"code": "200002", "name": "万 科Ｂ"}, {"code": "200011", "name": "深物业B"}]}
+	]}, 
+	{"secType": "港股", "secTypeHref": "http://app.finance.ifeng.com/hq/list.php?type=hkstock", "secSubType": [
+		{"secType": "港股", "secSubType": "股票", "secSubTypeHref": "http://app.finance.ifeng.com/hq/list.php?type=hkstock&class=gp", "object": [{"code": "00001", "name": "长江实业"}, {"code": "00002", "name": "中电控股"}, {"code": "00003", "name": "香港中华煤气"}]}, 
+		{"secType": "港股", "secSubType": "窝轮", "secSubTypeHref": "http://app.finance.ifeng.com/hq/list.php?type=hkstock&class=wl", "object": []}
+	]}, 
+	
+	{"secType": "基金", "secTypeHref": "http://app.finance.ifeng.com/hq/list.php?type=fund"}, 
+	
+	{"secType": "债券", "secTypeHref": "http://app.finance.ifeng.com/hq/list.php?type=bond", "secSubType": [
+		{"secType": "债券", "secSubType": "沪国债", "secSubTypeHref": "http://app.finance.ifeng.com/hq/list.php?type=bond&class=hgz", "object": [{"code": "010004", "name": "20国债⑷"}, {"code": "010107", "name": "21国债⑺"}, {"code": "010110", "name": "21国债⑽"}]}, 
+		{"secType": "债券", "secSubType": "沪企债", "secSubTypeHref": "http://app.finance.ifeng.com/hq/list.php?type=bond&class=hqz", "object": [{"code": "120101", "name": "01中移动"}, {"code": "120102", "name": "01三峡债"}, {"code": "120201", "name": "02三峡债"}]}, 
+		{"secType": "债券", "secSubType": "沪转债", "secSubTypeHref": "http://app.finance.ifeng.com/hq/list.php?type=bond&class=hzz", "object": [{"code": "110002", "name": "南山转债"}, {"code": "110003", "name": "新钢转债"}, {"code": "110004", "name": "厦工转债"}]}, 
+		{"secType": "债券", "secSubType": "深国债", "secSubTypeHref": "http://app.finance.ifeng.com/hq/list.php?type=bond&class=sgz", "object": [{"code": "100115", "name": "国债0115"}, {"code": "100203", "name": "国债0203"}, {"code": "100210", "name": "国债0210"}]}, 
+		{"secType": "债券", "secSubType": "深企债", "secSubTypeHref": "http://app.finance.ifeng.com/hq/list.php?type=bond&class=sqz", "object": [{"code": "111015", "name": "01三峡10"}, {"code": "111016", "name": "01广核债"}, {"code": "111018", "name": "02电网15"}]}, 
+		{"secType": "债券", "secSubType": "深转债", "secSubTypeHref": "http://app.finance.ifeng.com/hq/list.php?type=bond&class=szz", "object": [{"code": "120001", "name": "16以岭EB"}, {"code": "123001", "name": "蓝标转债"}, {"code": "125089", "name": "深机转债"}]}
+	]
+	}
+]
+
+
+/* 源于https://q.stock.sohu.com/cn/bk.shtml  */
+/* shared综合板块是将industy、region、concep三个板块都放在一起，因此其实没必要采集shared板块的数据 */
+{
+	"shared": [
+		{"name": "碳化硅", "url": "https://q.stock.sohu.com/cn/bk_4978.shtml", "stockList": ["300484", "605111"]}, 
+		{"name": "昨日连板", "url": "https://q.stock.sohu.com/cn/bk_4570.shtml", "stockList": ["002269", "600403"]}, 
+		{"name": "北斗导航", "url": "https://q.stock.sohu.com/cn/bk_4377.shtml", "stockList": ["600435", "300590"]}
+	], 
+	"industry": [
+		{"name": "电子", "url": "https://q.stock.sohu.com/cn/bk_3123.shtml", "stockList": ["688036", "002916"]}, 
+		{"name": "食品饮料", "url": "https://q.stock.sohu.com/cn/bk_3122.shtml", "stockList": ["603156", "603345"]}, 
+		{"name": "国防军工", "url": "https://q.stock.sohu.com/cn/bk_3106.shtml", "stockList": ["000519", "600435"]}, 
+		{"name": "通信", "url": "https://q.stock.sohu.com/cn/bk_3125.shtml", "stockList": ["300590", "000851"]}, 
+		{"name": "计算机", "url": "https://q.stock.sohu.com/cn/bk_3117.shtml", "stockList": ["002072", "300663"]}
+	], 
+	"region": [
+		{"name": "贵州板块", "url": "https://q.stock.sohu.com/cn/bk_3132.shtml", "stockList": ["002895", "000851"]}, 
+		{"name": "山西板块", "url": "https://q.stock.sohu.com/cn/bk_3147.shtml", "stockList": ["600691", "300486"]}, 
+		{"name": "北京板块", "url": "https://q.stock.sohu.com/cn/bk_3127.shtml", "stockList": ["300661", "300662"]}
+	], 
+	"concept": [
+		{"name": "碳化硅", "url": "https://q.stock.sohu.com/cn/bk_4978.shtml", "stockList": ["605111", "603290"]}, 
+		{"name": "昨日连板", "url": "https://q.stock.sohu.com/cn/bk_4570.shtml", "stockList": ["002269", "600403"]}, 
+		{"name": "北斗导航", "url": "https://q.stock.sohu.com/cn/bk_4377.shtml", "stockList": ["300965", "300782"]}
+	]
+}
+

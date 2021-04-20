@@ -13,7 +13,8 @@ def updateFundPositionShares(fundCodeList):
         fLog.writeLog(f"Start to update fund position shares {index}/{len(fundCodeList)} - {fundCode}")
         #fundCode = fundCodeList[0]
         try:
-            driver.get(f"http://fund.eastmoney.com/{fundCode}.html") # get接受url可以是如何网址，此处以百度为例
+            driver.get(f"http://fund.eastmoney.com/{fundCode}.html") 
+            #http://fund.eastmoney.com/161725.html
         except:
             fLog.writeLog(f'Loading page timeout, fund code is {fundCode}.')
         
